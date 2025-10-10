@@ -1,3 +1,73 @@
+# Public Report – Module 13  
+## Project: Crypto-Agility in Hybrid Corporate Environments for Post-Quantum Transition
+
+## Project Overview
+This project proposes the development and validation of an innovative **crypto-agility** architectural model for hybrid corporate environments (on-premises + cloud) with a **three-tier architecture**.  
+The model integrates a **specialized gateway** capable of agile, automated migrations to **post-quantum cryptography (PQC)** algorithms, along with intelligent mechanisms for **real-time detection** and **resilient recovery** from security incidents.
+
+The goal is to deliver a **practical, replicable framework validated in a simulation environment**, helping prepare critical organizations against the imminent threat of quantum computing.
+
+## Problem and Motivation
+**Quantum computing** poses a concrete threat to today’s cryptographic systems, especially in complex corporate environments relying on RSA and ECC.  
+While PQC provides resistance to quantum attacks, existing solutions mainly focus on algorithm replacement and do not address, in an integrated way, **monitoring, response, and recovery**.
+
+The identified gap is the **absence of end-to-end crypto-agility frameworks** that combine automated migration, detection, and resilience in hybrid and distributed corporate architectures.
+
+## Project Objectives
+
+### General Objective
+Develop and validate a **crypto-agility architectural model** for hybrid corporate environments, enabling agile migrations to post-quantum algorithms and strengthening detection and recovery mechanisms.
+
+### Specific Objectives
+- Map vulnerabilities of a three-tier environment regarding the transition to PQC  
+- Design a **crypto-agility gateway** integrated with monitoring and response modules  
+- Simulate, in the cloud, the migration of a legacy system to PQC with automated detection and recovery  
+- Evaluate performance, cost, and effectiveness of the proposed model compared to conventional PQC implementations
+
+## Module 13 Deliverables
+
+### 1. IBM CBOM Kit Mapping
+- Detailed study of the **IBM CBOM Kit** and its applicability as a support tool for crypto-agility  
+- Identification of components, APIs, and potential integrations with the proposed gateway
+
+### 2. Literature Review on PQC and Crypto-Agility
+- Survey of key scientific and institutional references, including:  
+  - **NIST PQC Standardization Project**  
+  - **Cyber Resilience Architectures** (resist, detect, recover)  
+  - **Commercial tools** for cryptographic transition
+
+### 3. Vulnerability Mapping in Three-Tier Environments
+- Identification of critical security points across **application**, **server**, and **database** layers  
+- Analysis of risks associated with legacy modules and protocols not compatible with PQC
+
+### 4. State of the Art in Cryptographic Transition Frameworks
+- Comparative study of existing solutions (IBM, Microsoft, AWS, etc.) and their limitations for PQC migration
+
+### 5. Gap Analysis
+- Technical and conceptual gaps between PQC theory and corporate migration practice
+
+### 6. Theoretical Framework Definition
+- Consolidation of theoretical foundations on **crypto-agility, PQC, security in hybrid architectures**, and **cyber resilience**
+
+## Technologies and Tools
+- **IBM CBOM Kit** – technical reference for legacy crypto inventory  
+- **Python / OpenSSL / liboqs** – libraries for PQC simulation and testing  
+- **AWS / IBM Cloud / Azure** – cloud platforms for simulation  
+- **NIST PQC Algorithms** – Kyber, Dilithium, Falcon  
+- **Draw.io / Lucidchart** – architectural modeling and migration flows
+
+## Expected Outcomes for Module 13
+- In-depth understanding of the **current corporate crypto-agility landscape**  
+- Definition of the **theoretical and technical foundations** for the crypto-agility gateway  
+- Structuring of the **conceptual model** to be detailed in the architectural design (Module 14)
+
+## Key References
+- NIST. *Post-Quantum Cryptography Standardization Project*.  
+- IBM Research. *CBOM Kit – Cryptographic Bill of Materials Toolkit*.  
+- Gartner (2023). *Crypto-Agility and Quantum-Readiness Frameworks*.  
+- Arakaki, R. et al. (2024). *Cyber Resilience Architectures*.  
+- ETSI TR 103 619 V2.1.1 (2020). *Quantum-Safe Cryptography and Security*.
+
 # Public Report – Módulo 13  
 ## Projeto: Criptoagilidade em Ambientes Corporativos Híbridos para Transição Pós-Quântica
 
