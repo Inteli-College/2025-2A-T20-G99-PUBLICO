@@ -1,6 +1,11 @@
 # Public Report – Module 13  
 ## Project: Crypto-Agility in Hybrid Corporate Environments for Post-Quantum Transition
 
+## Public Report – Module 14
+Module 14 deliverables are consolidated in the bilingual public report files below:
+- English: `English/public-report-module14.md`
+- Português: `Português/relatorio-publico-modulo14.md`
+
 ## Project Overview
 This project proposes the development and validation of an innovative **crypto-agility** architectural model for hybrid corporate environments (on-premises + cloud) with a **three-tier architecture**.  
 The model integrates a **specialized gateway** capable of agile, automated migrations to **post-quantum cryptography (PQC)** algorithms, along with intelligent mechanisms for **real-time detection** and **resilient recovery** from security incidents.
@@ -70,6 +75,11 @@ Develop and validate a **crypto-agility architectural model** for hybrid corpora
 
 # Public Report – Módulo 13  
 ## Projeto: Criptoagilidade em Ambientes Corporativos Híbridos para Transição Pós-Quântica
+
+## Relatório Público – Módulo 14
+As entregas do Módulo 14 (Sprints 1–5) estão consolidadas nos relatórios públicos abaixo:
+- English: `English/public-report-module14.md`
+- Português: `Português/relatorio-publico-modulo14.md`
 
 ---
 
