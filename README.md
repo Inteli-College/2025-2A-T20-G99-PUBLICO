@@ -9,12 +9,14 @@ The work proposes a Cryptography Bill of Materials (CBOM)-driven crypto-agility 
 
 ## What This Repository Contains
 
-This public repository contains the thesis documents and the evidence package needed to understand, audit, and partially reproduce the experimental claims reported in the work.
+This public repository contains the thesis documents, the submitted article, the submission receipts, and the evidence package needed to understand, audit, and partially reproduce the experimental claims reported in the work.
 
 | Path | Description |
 | --- | --- |
 | [TCC_Thomaz_Klifson_EN.pdf](<TCC_Thomaz_Klifson_EN.pdf>) | English version of the thesis. |
 | [TCC_Thomaz_Klifson_PT.pdf](<TCC_Thomaz_Klifson_PT.pdf>) | Portuguese version of the thesis. |
+| [submitted-article/paper_sbc_pt_revalidated.pdf](<submitted-article/paper_sbc_pt_revalidated.pdf>) | Portuguese SBC-format article submitted to the workshops documented by the submission receipts. |
+| [submission-receipts/](<submission-receipts/>) | Submission receipts and JEMS records documenting the article submissions to the WQuSec 2026 and WTICG 2026 workshops. |
 | [evidence-package/](<evidence-package/>) | Public evidence package with raw experiment outputs, topology files, CBOM prototypes, methodology documents, traceability notes, and SHA-256 hashes. |
 | [TERMO DE AUTORIZAÇÃO DE PUBLICAÇÃO DE TRABALHO ACADÊMICO - Título em EN.pdf](<TERMO DE AUTORIZAÇÃO DE PUBLICAÇÃO DE TRABALHO ACADÊMICO - Título em EN.pdf>) | Publication authorization document associated with the English title. |
 | [TERMO DE AUTORIZAÇÃO DE PUBLICAÇÃO DE TRABALHO ACADÊMICO - Título em PT.pdf](<TERMO DE AUTORIZAÇÃO DE PUBLICAÇÃO DE TRABALHO ACADÊMICO - Título em PT.pdf>) | Publication authorization document associated with the Portuguese title. |
@@ -33,6 +35,23 @@ The thesis treats crypto-agility as an operational governance problem, not only 
 - define rollback and recovery criteria for cryptographic migration failures.
 
 The validation uses a simulated banking topology with eight logical nodes, rootless Podman, and k6 scenarios. The experiments evaluate functional behavior, latency, stress response, controlled baseline-versus-canary comparison, and recovery after simulated secret-service unavailability.
+
+## Submitted Article
+
+The file [submitted-article/paper_sbc_pt_revalidated.pdf](<submitted-article/paper_sbc_pt_revalidated.pdf>) contains the Portuguese SBC-format article submitted to the workshops documented in [submission-receipts/](<submission-receipts/>). It is kept separately from the thesis PDFs so the repository distinguishes the full thesis, the submitted article, the submission receipts, and the supporting experimental artifacts.
+
+## Submission Receipts
+
+The [submission-receipts/](<submission-receipts/>) directory contains the proof documents for the submitted article. These files are receipts and JEMS records, not experimental artifacts.
+
+| File | What it documents |
+| --- | --- |
+| [submission-receipts/E-mail WTICG 2026.pdf](<submission-receipts/E-mail WTICG 2026.pdf>) | Email confirmation for submission #29859 to **Workshop de Trabalhos de Iniciação Científica e de Graduação (WTICG 2026)**. |
+| [submission-receipts/E-mail WQuSec 2026.pdf](<submission-receipts/E-mail WQuSec 2026.pdf>) | Email confirmation for submission #31587 to **Workshop Cibersegurança e Computação Quântica: Teoria, Tecnologia e Aplicações (WQuSec 2026)**. |
+| [submission-receipts/WQuSec.pdf](<submission-receipts/WQuSec.pdf>) | JEMS detail page for submission #31587, registered in **WQuSec 2026 / Artigos curtos**. |
+| [submission-receipts/Submissões SbSeg.pdf](<submission-receipts/Submissões SbSeg.pdf>) | JEMS submissions overview showing the active WQuSec 2026 and WTICG 2026 submissions. |
+
+In this context, WQuSec 2026 is the cybersecurity and quantum computing workshop focused on theory, technology, and applications. WTICG 2026 is the workshop for scientific initiation and undergraduate research works.
 
 ## Evidence Package
 
