@@ -1,0 +1,18 @@
+
+# S4-E01 — indisponibilidade do mock-vault
+timestamp_stop: 2026-06-10T16:24:36-03:00
+
+## parando security-integration-node
+security-integration-node
+
+## containers após parada
+security-integration-node  Exited (137) 3 seconds ago (unhealthy)
+data-node                  Up About an hour (unhealthy)
+k8s-control                Up About an hour (unhealthy)
+k8s-worker-2               Up About an hour (unhealthy)
+
+## chamada app-chain com mock-vault indisponível
+result: http_error
+http_status: 500
+client_elapsed_ms: 18.21
+body: {"node": "k8s-worker-2", "role": "app", "canary": "baseline", "error": "<urlopen error [Errno -2] Name or service not known>", "elapsed_ms": 2.08}

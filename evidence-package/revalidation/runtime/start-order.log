@@ -1,0 +1,9 @@
+=== start data/security/canary/app/web/control/load/observability ===
+data-node
+security-integration-node
+k8s-worker-3
+k8s-worker-2
+k8s-worker-1
+k8s-control
+load-chaos-node
+observability-node

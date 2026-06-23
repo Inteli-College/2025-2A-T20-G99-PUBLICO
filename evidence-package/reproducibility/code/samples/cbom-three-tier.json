@@ -1,0 +1,82 @@
+[
+  {
+    "component": "web-portal",
+    "tier": "presentation",
+    "environment": "prod",
+    "cbom_version": "2025-02-05T12:00:00Z",
+    "crypto": [
+      {
+        "algo": "RSA-2048",
+        "mode": "TLS-server",
+        "protocol": "TLS 1.2",
+        "usage": "handshake",
+        "key_size": 2048,
+        "risk": "high",
+        "policy_violation": true,
+        "last_seen": "2025-02-04T18:00:00Z"
+      },
+      {
+        "algo": "ECDSA-P256",
+        "mode": "JWT-sign",
+        "usage": "signature",
+        "key_size": 256,
+        "risk": "medium",
+        "policy_violation": false,
+        "last_seen": "2025-02-04T18:05:00Z"
+      }
+    ]
+  },
+  {
+    "component": "api-orders",
+    "tier": "application",
+    "environment": "prod",
+    "cbom_version": "2025-02-05T12:05:00Z",
+    "crypto": [
+      {
+        "algo": "ECDH-P256",
+        "mode": "mTLS-client",
+        "protocol": "mTLS",
+        "usage": "handshake",
+        "key_size": 256,
+        "risk": "high",
+        "policy_violation": true,
+        "last_seen": "2025-02-05T07:30:00Z"
+      },
+      {
+        "algo": "AES-256",
+        "mode": "data-at-rest",
+        "usage": "encryption",
+        "key_size": 256,
+        "risk": "low",
+        "policy_violation": false,
+        "last_seen": "2025-02-05T07:30:00Z"
+      }
+    ]
+  },
+  {
+    "component": "ledger-db",
+    "tier": "data",
+    "environment": "prod",
+    "cbom_version": "2025-02-05T12:10:00Z",
+    "crypto": [
+      {
+        "algo": "RSA-3072",
+        "mode": "backup-sign",
+        "usage": "signature",
+        "key_size": 3072,
+        "risk": "medium",
+        "policy_violation": false,
+        "last_seen": "2025-02-05T02:10:00Z"
+      },
+      {
+        "algo": "AES-256",
+        "mode": "tablespace",
+        "usage": "encryption",
+        "key_size": 256,
+        "risk": "low",
+        "policy_violation": false,
+        "last_seen": "2025-02-05T02:10:00Z"
+      }
+    ]
+  }
+]

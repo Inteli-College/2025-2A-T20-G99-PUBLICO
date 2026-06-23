@@ -1,0 +1,39 @@
+# S4-E01 — baseline antes da indisponibilidade
+timestamp: 2026-06-10T16:23:32-03:00
+
+## containers relevantes
+security-integration-node  Up About an hour (unhealthy)
+data-node                  Up About an hour (unhealthy)
+k8s-control                Up About an hour (unhealthy)
+k8s-worker-2               Up About an hour (unhealthy)
+
+## chamada app-chain com mock-vault disponível
+http_status: 200
+client_elapsed_ms: 40.09
+{
+  "node": "k8s-worker-2",
+  "role": "app",
+  "canary": "baseline",
+  "security": {
+    "node": "security-integration-node",
+    "role": "security",
+    "secret_profile": "mock-vault",
+    "rotation_policy_days": 90,
+    "token_ttl_minutes": 30
+  },
+  "database": {
+    "enabled": true,
+    "ok": true,
+    "created_at": "2026-06-10T19:23:32.752498+00:00",
+    "event_count": 11500
+  },
+  "next": {
+    "node": "k8s-worker-3",
+    "role": "app-canary",
+    "canary": "canary",
+    "next_url": null,
+    "security_url": "http://security-integration-node:8080/secret",
+    "db_enabled": true
+  },
+  "elapsed_ms": 23.46
+}

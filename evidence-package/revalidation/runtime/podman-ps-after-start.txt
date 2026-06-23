@@ -1,0 +1,9 @@
+CONTAINER ID  NAMES                      IMAGE                                                        STATUS                        PORTS
+abd8857133f1  security-integration-node  docker.io/library/topology-security-integration-node:latest  Up About a minute (starting)  
+2e80eea8070a  data-node                  docker.io/library/postgres:latest                            Up About a minute (starting)  
+7551e210cddc  k8s-control                docker.io/library/topology-k8s-control:latest                Up 53 seconds (starting)      
+046a66483963  k8s-worker-3               docker.io/library/topology-k8s-worker-3:latest               Up About a minute (starting)  0.0.0.0:8081->8080/tcp
+9dfff6fb1c3e  k8s-worker-2               docker.io/library/topology-k8s-worker-2:latest               Up About a minute (starting)  
+d8a94249451c  k8s-worker-1               docker.io/library/topology-k8s-worker-1:latest               Up 59 seconds (starting)      0.0.0.0:8080->8080/tcp
+a1fbaae2e035  load-chaos-node            docker.io/grafana/k6:latest                                  Up 48 seconds                 
+5965e857f83d  observability-node         docker.io/prom/prometheus:latest                             Exited (2) 43 seconds ago     0.0.0.0:9090->9090/tcp

@@ -1,0 +1,232 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000" role="img" aria-labelledby="title desc">
+  <title id="title">Diagrama do ambiente experimental executado no supercomputador do Inteli</title>
+  <desc id="desc">Acesso via VPN e SSH a um servidor acadêmico de alto desempenho do Inteli, contendo oito nós lógicos em containers Podman rootless e cinco redes isoladas.</desc>
+
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#071426"/>
+      <stop offset="55%" stop-color="#0c2038"/>
+      <stop offset="100%" stop-color="#102d46"/>
+    </linearGradient>
+    <linearGradient id="serverFill" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#102b48"/>
+      <stop offset="100%" stop-color="#0a1c31"/>
+    </linearGradient>
+    <linearGradient id="podmanFill" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#112c43"/>
+      <stop offset="100%" stop-color="#0b2135"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="10" flood-color="#000000" flood-opacity="0.28"/>
+    </filter>
+    <filter id="smallShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#000000" flood-opacity="0.24"/>
+    </filter>
+    <marker id="arrowCyan" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#46d7e8"/>
+    </marker>
+    <marker id="arrowBlue" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#70a9ff"/>
+    </marker>
+    <marker id="arrowAmber" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#f4bf58"/>
+    </marker>
+    <style>
+      .sans { font-family: "Inter", "Segoe UI", Arial, sans-serif; }
+      .mono { font-family: "Cascadia Mono", "Consolas", monospace; }
+      .title { font-size: 37px; font-weight: 750; fill: #f4f8fc; letter-spacing: -0.5px; }
+      .subtitle { font-size: 18px; fill: #a9bed2; }
+      .section { font-size: 18px; font-weight: 700; fill: #e8f3fb; }
+      .body { font-size: 15px; fill: #c7d7e6; }
+      .small { font-size: 13px; fill: #9fb5c8; }
+      .tiny { font-size: 12px; fill: #a9bed2; }
+      .nodeTitle { font-size: 16px; font-weight: 700; fill: #f7fbff; }
+      .nodeRole { font-size: 13px; fill: #b8cada; }
+      .badgeText { font-size: 11px; font-weight: 700; fill: #061320; letter-spacing: 0.2px; }
+      .networkText { font-size: 12px; font-weight: 700; fill: #d9e8f3; }
+    </style>
+  </defs>
+
+  <rect width="1600" height="1000" fill="url(#background)"/>
+  <circle cx="1460" cy="85" r="210" fill="#1a5476" opacity="0.13"/>
+  <circle cx="130" cy="900" r="270" fill="#0b7180" opacity="0.10"/>
+
+  <text x="70" y="68" class="sans title">Ambiente experimental no supercomputador do Inteli</text>
+  <text x="70" y="101" class="sans subtitle">8 nós lógicos em um único host remoto, acessado via VPN acadêmica + SSH</text>
+  <rect x="1335" y="48" width="195" height="52" rx="26" fill="#123d51" stroke="#39c6d9" stroke-width="1.5"/>
+  <circle cx="1367" cy="74" r="8" fill="#52e0a4"/>
+  <text x="1385" y="80" class="sans section" font-size="16">EXECUÇÃO REMOTA</text>
+
+  <!-- Access path -->
+  <g filter="url(#shadow)">
+    <rect x="70" y="145" width="270" height="170" rx="18" fill="#10263c" stroke="#355777" stroke-width="1.5"/>
+  </g>
+  <rect x="94" y="169" width="58" height="44" rx="7" fill="#153b57" stroke="#4bcadb"/>
+  <rect x="102" y="177" width="42" height="27" rx="2" fill="#071827"/>
+  <path d="M113 220 H133" stroke="#4bcadb" stroke-width="3" stroke-linecap="round"/>
+  <text x="170" y="185" class="sans section">Pesquisador</text>
+  <text x="170" y="209" class="sans body">Máquina local</text>
+  <text x="94" y="253" class="sans small">1. Conexão à VPN acadêmica</text>
+  <text x="94" y="279" class="sans small">2. Sessão SSH autenticada</text>
+  <text x="94" y="302" class="mono tiny">ssh usuário@host-inteli</text>
+
+  <path d="M340 230 H455" stroke="#46d7e8" stroke-width="4" stroke-linecap="round" marker-end="url(#arrowCyan)"/>
+  <rect x="360" y="191" width="78" height="29" rx="14" fill="#123c50" stroke="#39c6d9"/>
+  <text x="379" y="211" class="sans networkText">VPN</text>
+  <rect x="368" y="241" width="70" height="29" rx="14" fill="#123c50" stroke="#39c6d9"/>
+  <text x="385" y="261" class="sans networkText">SSH</text>
+
+  <!-- Server -->
+  <g filter="url(#shadow)">
+    <rect x="465" y="135" width="1065" height="790" rx="26" fill="url(#serverFill)" stroke="#2b6687" stroke-width="2"/>
+  </g>
+  <rect x="465" y="135" width="1065" height="82" rx="26" fill="#113653"/>
+  <path d="M465 191 H1530" stroke="#2b6687" stroke-width="1.5"/>
+
+  <rect x="495" y="157" width="38" height="38" rx="8" fill="#1a536e" stroke="#53d3e2"/>
+  <path d="M505 168 H523 M505 176 H523 M505 184 H518" stroke="#d7f6fb" stroke-width="3" stroke-linecap="round"/>
+  <text x="550" y="170" class="sans section">Host remoto do Inteli</text>
+  <text x="550" y="195" class="sans body">Servidor acadêmico de alto desempenho • Ubuntu 24.04.3 LTS</text>
+  <text x="1480" y="170" text-anchor="end" class="sans tiny">64 vCPUs • Intel Xeon Gold 6454S • 125 GiB RAM</text>
+  <text x="1480" y="194" text-anchor="end" class="sans tiny">2,4 TB adicional • NVIDIA L4 disponível (não utilizada)</text>
+
+  <!-- Podman boundary -->
+  <rect x="495" y="240" width="1005" height="615" rx="22" fill="url(#podmanFill)" stroke="#39708b" stroke-width="1.5" stroke-dasharray="8 6"/>
+  <text x="525" y="276" class="sans section">Podman 4.9.3 rootless</text>
+  <text x="742" y="276" class="sans small">containers isolados no mesmo host físico</text>
+  <rect x="1294" y="251" width="176" height="35" rx="17" fill="#183c50" stroke="#57d6c2"/>
+  <text x="1325" y="274" class="sans networkText">8 NÓS CRIADOS</text>
+
+  <!-- Network badges -->
+  <text x="525" y="311" class="sans small">Redes bridge segregadas:</text>
+  <g>
+    <rect x="690" y="292" width="112" height="28" rx="14" fill="#2a86a1"/>
+    <text x="710" y="311" class="sans badgeText">INGRESS</text>
+    <rect x="810" y="292" width="112" height="28" rx="14" fill="#4d79c7"/>
+    <text x="831" y="311" class="sans badgeText">CLUSTER</text>
+    <rect x="930" y="292" width="91" height="28" rx="14" fill="#5f9e78"/>
+    <text x="952" y="311" class="sans badgeText">DADOS</text>
+    <rect x="1029" y="292" width="119" height="28" rx="14" fill="#a276c2"/>
+    <text x="1047" y="311" class="sans badgeText">SEGURANÇA</text>
+    <rect x="1156" y="292" width="158" height="28" rx="14" fill="#c58c42"/>
+    <text x="1174" y="311" class="sans badgeText">OBSERVABILIDADE</text>
+  </g>
+
+  <!-- Flow labels -->
+  <text x="552" y="360" class="sans small">PLANO DE CONTROLE</text>
+  <text x="552" y="496" class="sans small">SISTEMA SOB TESTE</text>
+  <text x="552" y="687" class="sans small">SERVIÇOS DE APOIO</text>
+
+  <!-- Control node -->
+  <g filter="url(#smallShadow)">
+    <rect x="720" y="338" width="270" height="106" rx="16" fill="#173c61" stroke="#70a9ff" stroke-width="1.6"/>
+  </g>
+  <circle cx="752" cy="371" r="16" fill="#4d79c7"/>
+  <path d="M744 371 H760 M752 363 V379" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+  <text x="781" y="374" class="mono nodeTitle">k8s-control</text>
+  <text x="744" y="405" class="sans nodeRole">Controle, CBOM e orquestração</text>
+  <rect x="744" y="416" width="72" height="19" rx="9" fill="#4d79c7"/>
+  <text x="756" y="430" class="sans badgeText">CLUSTER</text>
+  <rect x="822" y="416" width="126" height="19" rx="9" fill="#c58c42"/>
+  <text x="835" y="430" class="sans badgeText">OBSERVABILIDADE</text>
+
+  <!-- App nodes -->
+  <g filter="url(#smallShadow)">
+    <rect x="555" y="515" width="270" height="128" rx="16" fill="#133d50" stroke="#3fc8d9" stroke-width="1.6"/>
+    <rect x="861" y="515" width="270" height="128" rx="16" fill="#163955" stroke="#70a9ff" stroke-width="1.6"/>
+    <rect x="1167" y="515" width="270" height="128" rx="16" fill="#28384e" stroke="#b291dc" stroke-width="1.6"/>
+  </g>
+
+  <circle cx="587" cy="550" r="16" fill="#2a86a1"/>
+  <path d="M579 546 H595 M579 554 H591" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+  <text x="616" y="554" class="mono nodeTitle">k8s-worker-1</text>
+  <text x="579" y="584" class="sans nodeRole">Camada web • baseline</text>
+  <rect x="579" y="603" width="72" height="19" rx="9" fill="#2a86a1"/>
+  <text x="591" y="617" class="sans badgeText">INGRESS</text>
+  <rect x="657" y="603" width="72" height="19" rx="9" fill="#4d79c7"/>
+  <text x="669" y="617" class="sans badgeText">CLUSTER</text>
+
+  <circle cx="893" cy="550" r="16" fill="#4d79c7"/>
+  <path d="M885 546 H901 M885 554 H897" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+  <text x="922" y="554" class="mono nodeTitle">k8s-worker-2</text>
+  <text x="885" y="584" class="sans nodeRole">Camada app • API principal</text>
+  <rect x="885" y="603" width="72" height="19" rx="9" fill="#4d79c7"/>
+  <text x="897" y="617" class="sans badgeText">CLUSTER</text>
+  <rect x="963" y="603" width="63" height="19" rx="9" fill="#5f9e78"/>
+  <text x="975" y="617" class="sans badgeText">DADOS</text>
+  <rect x="1032" y="603" width="76" height="19" rx="9" fill="#a276c2"/>
+  <text x="1042" y="617" class="sans badgeText">SEGUR.</text>
+
+  <circle cx="1199" cy="550" r="16" fill="#9a77bd"/>
+  <path d="M1191 546 H1207 M1191 554 H1203" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round"/>
+  <text x="1228" y="554" class="mono nodeTitle">k8s-worker-3</text>
+  <text x="1191" y="584" class="sans nodeRole">Camada app • canário</text>
+  <rect x="1191" y="603" width="72" height="19" rx="9" fill="#2a86a1"/>
+  <text x="1203" y="617" class="sans badgeText">INGRESS</text>
+  <rect x="1269" y="603" width="72" height="19" rx="9" fill="#4d79c7"/>
+  <text x="1281" y="617" class="sans badgeText">CLUSTER</text>
+  <rect x="1347" y="603" width="63" height="19" rx="9" fill="#5f9e78"/>
+  <text x="1359" y="617" class="sans badgeText">DADOS</text>
+
+  <!-- Main application flow -->
+  <path d="M825 565 H854" stroke="#46d7e8" stroke-width="3" marker-end="url(#arrowCyan)"/>
+  <path d="M1131 565 H1160" stroke="#46d7e8" stroke-width="3" marker-end="url(#arrowCyan)"/>
+  <text x="828" y="550" class="sans tiny">HTTP</text>
+  <text x="1134" y="550" class="sans tiny">HTTP</text>
+
+  <!-- Control arrows -->
+  <path d="M782 444 C760 468,715 477,690 510" fill="none" stroke="#70a9ff" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#arrowBlue)"/>
+  <path d="M855 444 V507" fill="none" stroke="#70a9ff" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#arrowBlue)"/>
+  <path d="M927 444 C970 472,1245 465,1294 509" fill="none" stroke="#70a9ff" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#arrowBlue)"/>
+  <text x="1005" y="469" class="sans tiny">orquestração / estado</text>
+
+  <!-- Support nodes -->
+  <g filter="url(#smallShadow)">
+    <rect x="555" y="706" width="205" height="112" rx="16" fill="#243f39" stroke="#72bc8d" stroke-width="1.5"/>
+    <rect x="780" y="706" width="250" height="112" rx="16" fill="#3a304a" stroke="#b291dc" stroke-width="1.5"/>
+    <rect x="1050" y="706" width="205" height="112" rx="16" fill="#493923" stroke="#e0aa5d" stroke-width="1.5"/>
+    <rect x="1275" y="706" width="162" height="112" rx="16" fill="#173f4c" stroke="#46d7e8" stroke-width="1.5"/>
+  </g>
+
+  <text x="576" y="740" class="mono nodeTitle">data-node</text>
+  <text x="576" y="765" class="sans nodeRole">PostgreSQL</text>
+  <text x="576" y="789" class="sans small">Dados e evidências</text>
+  <rect x="576" y="797" width="63" height="17" rx="8" fill="#5f9e78"/>
+  <text x="588" y="810" class="sans badgeText">DADOS</text>
+
+  <text x="801" y="740" class="mono" font-size="13.5" font-weight="700" fill="#f7fbff">security-integration-node</text>
+  <text x="801" y="765" class="sans nodeRole">KMS/Vault simulado</text>
+  <text x="801" y="789" class="sans small">Segredos e integração</text>
+  <rect x="801" y="797" width="92" height="17" rx="8" fill="#a276c2"/>
+  <text x="812" y="810" class="sans badgeText">SEGURANÇA</text>
+
+  <text x="1071" y="740" class="mono nodeTitle">observability-node</text>
+  <text x="1071" y="765" class="sans nodeRole">Prometheus</text>
+  <text x="1071" y="789" class="sans small">Métricas e telemetria</text>
+  <rect x="1071" y="797" width="132" height="17" rx="8" fill="#c58c42"/>
+  <text x="1083" y="810" class="sans badgeText">OBSERVABILIDADE</text>
+
+  <text x="1296" y="740" class="mono nodeTitle">load-chaos-node</text>
+  <text x="1296" y="765" class="sans nodeRole">Grafana k6</text>
+  <text x="1296" y="789" class="sans small">Carga e caos</text>
+  <rect x="1296" y="797" width="72" height="17" rx="8" fill="#2a86a1"/>
+  <text x="1308" y="810" class="sans badgeText">INGRESS</text>
+
+  <!-- Support flows -->
+  <path d="M953 643 C900 674,743 676,680 701" fill="none" stroke="#77bc8d" stroke-width="2.4" marker-end="url(#arrowBlue)"/>
+  <path d="M1265 643 C1180 670,1040 674,936 701" fill="none" stroke="#b291dc" stroke-width="2.4" marker-end="url(#arrowBlue)"/>
+  <path d="M1356 706 C1340 672,1318 665,1293 647" fill="none" stroke="#46d7e8" stroke-width="3" marker-end="url(#arrowCyan)"/>
+  <path d="M1356 706 C1305 670,802 674,722 647" fill="none" stroke="#46d7e8" stroke-width="2" stroke-dasharray="7 5" marker-end="url(#arrowCyan)"/>
+  <text x="1249" y="682" class="sans tiny">carga k6</text>
+
+  <!-- Observability dotted fan -->
+  <path d="M1148 706 C1115 674,1048 669,1011 645" fill="none" stroke="#f4bf58" stroke-width="1.8" stroke-dasharray="5 5" marker-end="url(#arrowAmber)"/>
+  <path d="M1110 706 C1000 650,787 654,730 646" fill="none" stroke="#f4bf58" stroke-width="1.4" stroke-dasharray="5 5" opacity="0.9"/>
+  <path d="M1190 706 C1240 673,1303 668,1323 646" fill="none" stroke="#f4bf58" stroke-width="1.4" stroke-dasharray="5 5" opacity="0.9"/>
+  <text x="1060" y="677" class="sans tiny">coleta de métricas</text>
+
+  <!-- Footer -->
+  <rect x="70" y="947" width="1460" height="1" fill="#31536e"/>
+  <text x="70" y="977" class="sans small">Evidência arquitetural: topologia definida em lab/topology/docker-compose.yml e implantada remotamente com Podman Compose.</text>
+  <text x="1410" y="977" text-anchor="end" class="sans small">Ambiente simulado • 8 containers • 5 redes isoladas</text>
+</svg>

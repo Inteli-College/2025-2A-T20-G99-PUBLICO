@@ -1,0 +1,19 @@
+global:
+  scrape_interval: 5s
+  evaluation_interval: 5s
+
+scrape_configs:
+  - job_name: prometheus
+    static_configs:
+      - targets:
+          - observability-node:9090
+
+  - job_name: module14-nodes
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+          - k8s-control:8080
+          - k8s-worker-1:8080
+          - k8s-worker-2:8080
+          - k8s-worker-3:8080
+          - security-integration-node:8080

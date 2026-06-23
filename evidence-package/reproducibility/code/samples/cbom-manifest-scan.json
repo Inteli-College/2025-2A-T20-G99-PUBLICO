@@ -1,0 +1,374 @@
+{
+  "schema": "cbomkit-cli/v1",
+  "generated_at": "2025-11-08T02:03:17.974067+00:00",
+  "totals": {
+    "components_scanned": 1,
+    "files_with_findings": 3,
+    "total_findings": 53
+  },
+  "components": [
+    {
+      "component": "repo",
+      "tier": "web",
+      "root": "/Users/klubi/Documents/GitHub/2025-2A-T20-G99-INTERNO",
+      "files": [
+        {
+          "path": "code/cbomkit_cli.py",
+          "absolute_path": "/Users/klubi/Documents/GitHub/2025-2A-T20-G99-INTERNO/code/cbomkit_cli.py",
+          "last_modified": "2025-11-08T02:02:44.330734+00:00",
+          "algorithms": [
+            {
+              "name": "RSA",
+              "category": "asymmetric",
+              "line": 59,
+              "context": "\"RSA\": [r\"RSA[-_ ]?(?:1024|2048|3072|4096)?\"],"
+            },
+            {
+              "name": "RSA",
+              "category": "asymmetric",
+              "line": 59,
+              "context": "\"RSA\": [r\"RSA[-_ ]?(?:1024|2048|3072|4096)?\"],"
+            },
+            {
+              "name": "RSA",
+              "category": "asymmetric",
+              "line": 101,
+              "context": "if any(key in upper for key in (\"RSA\", \"ECDSA\", \"ECDH\", \"DILITHIUM\", \"FALCON\")):"
+            },
+            {
+              "name": "ECDSA",
+              "category": "asymmetric",
+              "line": 60,
+              "context": "\"ECDSA\": [r\"ECDSA[-_ ]?(?:P[0-9]+)?\"],"
+            },
+            {
+              "name": "ECDSA",
+              "category": "asymmetric",
+              "line": 60,
+              "context": "\"ECDSA\": [r\"ECDSA[-_ ]?(?:P[0-9]+)?\"],"
+            },
+            {
+              "name": "ECDSA",
+              "category": "asymmetric",
+              "line": 101,
+              "context": "if any(key in upper for key in (\"RSA\", \"ECDSA\", \"ECDH\", \"DILITHIUM\", \"FALCON\")):"
+            },
+            {
+              "name": "ECDH",
+              "category": "asymmetric",
+              "line": 61,
+              "context": "\"ECDH\": [r\"ECDH[-_ ]?(?:P[0-9]+)?\"],"
+            },
+            {
+              "name": "ECDH",
+              "category": "asymmetric",
+              "line": 61,
+              "context": "\"ECDH\": [r\"ECDH[-_ ]?(?:P[0-9]+)?\"],"
+            },
+            {
+              "name": "ECDH",
+              "category": "asymmetric",
+              "line": 101,
+              "context": "if any(key in upper for key in (\"RSA\", \"ECDSA\", \"ECDH\", \"DILITHIUM\", \"FALCON\")):"
+            },
+            {
+              "name": "AES",
+              "category": "symmetric",
+              "line": 62,
+              "context": "\"AES\": [r\"AES[-_ ]?(?:128|192|256)?\"],"
+            },
+            {
+              "name": "AES",
+              "category": "symmetric",
+              "line": 62,
+              "context": "\"AES\": [r\"AES[-_ ]?(?:128|192|256)?\"],"
+            },
+            {
+              "name": "AES",
+              "category": "symmetric",
+              "line": 103,
+              "context": "if any(key in upper for key in (\"AES\", \"DES\", \"3DES\", \"CHACHA20\")):"
+            },
+            {
+              "name": "ChaCha20",
+              "category": "symmetric",
+              "line": 63,
+              "context": "\"ChaCha20\": [r\"ChaCha20\"],"
+            },
+            {
+              "name": "ChaCha20",
+              "category": "symmetric",
+              "line": 63,
+              "context": "\"ChaCha20\": [r\"ChaCha20\"],"
+            },
+            {
+              "name": "ChaCha20",
+              "category": "symmetric",
+              "line": 103,
+              "context": "if any(key in upper for key in (\"AES\", \"DES\", \"3DES\", \"CHACHA20\")):"
+            },
+            {
+              "name": "DES",
+              "category": "symmetric",
+              "line": 64,
+              "context": "\"DES\": [r\"\\bDES(?:-EDE3)?\\b\"],"
+            },
+            {
+              "name": "DES",
+              "category": "symmetric",
+              "line": 103,
+              "context": "if any(key in upper for key in (\"AES\", \"DES\", \"3DES\", \"CHACHA20\")):"
+            },
+            {
+              "name": "3DES",
+              "category": "symmetric",
+              "line": 65,
+              "context": "\"3DES\": [r\"3DES\"],"
+            },
+            {
+              "name": "3DES",
+              "category": "symmetric",
+              "line": 65,
+              "context": "\"3DES\": [r\"3DES\"],"
+            },
+            {
+              "name": "3DES",
+              "category": "symmetric",
+              "line": 103,
+              "context": "if any(key in upper for key in (\"AES\", \"DES\", \"3DES\", \"CHACHA20\")):"
+            },
+            {
+              "name": "MD5",
+              "category": "hash",
+              "line": 66,
+              "context": "\"MD5\": [r\"MD5\"],"
+            },
+            {
+              "name": "MD5",
+              "category": "hash",
+              "line": 66,
+              "context": "\"MD5\": [r\"MD5\"],"
+            },
+            {
+              "name": "MD5",
+              "category": "hash",
+              "line": 105,
+              "context": "if \"SHA\" in upper or \"MD5\" in upper:"
+            },
+            {
+              "name": "SHA-1",
+              "category": "hash",
+              "line": 67,
+              "context": "\"SHA-1\": [r\"SHA[-_ ]?1\"],"
+            },
+            {
+              "name": "SHA-256",
+              "category": "hash",
+              "line": 68,
+              "context": "\"SHA-256\": [r\"SHA[-_ ]?256\"],"
+            },
+            {
+              "name": "SHA-512",
+              "category": "hash",
+              "line": 69,
+              "context": "\"SHA-512\": [r\"SHA[-_ ]?512\"],"
+            },
+            {
+              "name": "Kyber",
+              "category": "other",
+              "line": 70,
+              "context": "\"Kyber\": [r\"Kyber[-_ ]?(?:512|768|1024)?\"],"
+            },
+            {
+              "name": "Kyber",
+              "category": "other",
+              "line": 70,
+              "context": "\"Kyber\": [r\"Kyber[-_ ]?(?:512|768|1024)?\"],"
+            },
+            {
+              "name": "Dilithium",
+              "category": "asymmetric",
+              "line": 71,
+              "context": "\"Dilithium\": [r\"Dilithium[-_ ]?(?:2|3|5)?\"],"
+            },
+            {
+              "name": "Dilithium",
+              "category": "asymmetric",
+              "line": 71,
+              "context": "\"Dilithium\": [r\"Dilithium[-_ ]?(?:2|3|5)?\"],"
+            },
+            {
+              "name": "Dilithium",
+              "category": "asymmetric",
+              "line": 101,
+              "context": "if any(key in upper for key in (\"RSA\", \"ECDSA\", \"ECDH\", \"DILITHIUM\", \"FALCON\")):"
+            },
+            {
+              "name": "Falcon",
+              "category": "asymmetric",
+              "line": 72,
+              "context": "\"Falcon\": [r\"Falcon[-_ ]?(?:512|1024)?\"],"
+            },
+            {
+              "name": "Falcon",
+              "category": "asymmetric",
+              "line": 72,
+              "context": "\"Falcon\": [r\"Falcon[-_ ]?(?:512|1024)?\"],"
+            },
+            {
+              "name": "Falcon",
+              "category": "asymmetric",
+              "line": 101,
+              "context": "if any(key in upper for key in (\"RSA\", \"ECDSA\", \"ECDH\", \"DILITHIUM\", \"FALCON\")):"
+            }
+          ]
+        },
+        {
+          "path": "code/cbom_gateway.py",
+          "absolute_path": "/Users/klubi/Documents/GitHub/2025-2A-T20-G99-INTERNO/code/cbom_gateway.py",
+          "last_modified": "2025-11-08T01:42:15.977046+00:00",
+          "algorithms": [
+            {
+              "name": "RSA",
+              "category": "asymmetric",
+              "line": 29,
+              "context": "\"RSA-2048\": {"
+            },
+            {
+              "name": "RSA",
+              "category": "asymmetric",
+              "line": 30,
+              "context": "\"target\": \"TLS 1.3 h\u00edbrido (Kyber-768 + RSA-3072)\","
+            },
+            {
+              "name": "RSA",
+              "category": "asymmetric",
+              "line": 33,
+              "context": "\"RSA-3072\": {"
+            },
+            {
+              "name": "RSA",
+              "category": "asymmetric",
+              "line": 34,
+              "context": "\"target\": \"Assinatura h\u00edbrida (Dilithium-3 + RSA-3072)\","
+            },
+            {
+              "name": "ECDSA",
+              "category": "asymmetric",
+              "line": 37,
+              "context": "\"ECDSA-P256\": {"
+            },
+            {
+              "name": "ECDH",
+              "category": "asymmetric",
+              "line": 41,
+              "context": "\"ECDH-P256\": {"
+            },
+            {
+              "name": "ECDH",
+              "category": "asymmetric",
+              "line": 42,
+              "context": "\"target\": \"mTLS h\u00edbrido (Kyber-768 + ECDH) ou KEM TLS 1.3\","
+            },
+            {
+              "name": "Kyber",
+              "category": "other",
+              "line": 9,
+              "context": "- recommended target profiles (Kyber/Dilithium, etc.)"
+            },
+            {
+              "name": "Kyber",
+              "category": "other",
+              "line": 30,
+              "context": "\"target\": \"TLS 1.3 h\u00edbrido (Kyber-768 + RSA-3072)\","
+            },
+            {
+              "name": "Kyber",
+              "category": "other",
+              "line": 42,
+              "context": "\"target\": \"mTLS h\u00edbrido (Kyber-768 + ECDH) ou KEM TLS 1.3\","
+            },
+            {
+              "name": "Dilithium",
+              "category": "asymmetric",
+              "line": 9,
+              "context": "- recommended target profiles (Kyber/Dilithium, etc.)"
+            },
+            {
+              "name": "Dilithium",
+              "category": "asymmetric",
+              "line": 34,
+              "context": "\"target\": \"Assinatura h\u00edbrida (Dilithium-3 + RSA-3072)\","
+            },
+            {
+              "name": "Dilithium",
+              "category": "asymmetric",
+              "line": 38,
+              "context": "\"target\": \"Dilithium-2 para tokens/JWT e assinatura de artefatos\","
+            }
+          ]
+        },
+        {
+          "path": "code/samples/cbom-three-tier.json",
+          "absolute_path": "/Users/klubi/Documents/GitHub/2025-2A-T20-G99-INTERNO/code/samples/cbom-three-tier.json",
+          "last_modified": "2025-11-08T01:41:35.147181+00:00",
+          "algorithms": [
+            {
+              "name": "RSA",
+              "category": "asymmetric",
+              "line": 9,
+              "context": "\"algo\": \"RSA-2048\","
+            },
+            {
+              "name": "RSA",
+              "category": "asymmetric",
+              "line": 63,
+              "context": "\"algo\": \"RSA-3072\","
+            },
+            {
+              "name": "ECDSA",
+              "category": "asymmetric",
+              "line": 19,
+              "context": "\"algo\": \"ECDSA-P256\","
+            },
+            {
+              "name": "ECDH",
+              "category": "asymmetric",
+              "line": 36,
+              "context": "\"algo\": \"ECDH-P256\","
+            },
+            {
+              "name": "AES",
+              "category": "symmetric",
+              "line": 46,
+              "context": "\"algo\": \"AES-256\","
+            },
+            {
+              "name": "AES",
+              "category": "symmetric",
+              "line": 72,
+              "context": "\"algo\": \"AES-256\","
+            }
+          ]
+        }
+      ],
+      "summary": {
+        "RSA": 9,
+        "ECDSA": 5,
+        "ECDH": 6,
+        "AES": 5,
+        "ChaCha20": 3,
+        "DES": 2,
+        "3DES": 3,
+        "MD5": 3,
+        "SHA-1": 1,
+        "SHA-256": 1,
+        "SHA-512": 1,
+        "Kyber": 5,
+        "Dilithium": 6,
+        "Falcon": 3
+      },
+      "finding_count": 53
+    }
+  ]
+}

@@ -1,0 +1,271 @@
+\documentclass[12pt]{article}
+
+\makeatletter
+\def\@currname{sbc-template}
+\def\@currext{sty}
+\input{../Template_SBC/template-latex/sbc-template.sty}
+\makeatother
+
+\usepackage{graphicx,url}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+
+\sloppy
+\newcommand{\sbcshortcite}[2]{[#1]\nocite{#2}}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+
+\title{CBOM-Driven Crypto-Agility for Post-Quantum Migration in Hybrid Three-Tier Environments\\
+Method and Experimental Validation in a Simulated Banking Topology}
+
+% TODO: Replace "Hayashi" with the author's full name, if applicable.
+\author{Thomaz Klifson Falc\~ao Barboza\inst{1}, Reginaldo Arakaki\inst{1}, Hayashi\inst{1}}
+
+\address{Inteli -- Institute of Technology and Leadership\\
+S\~ao Paulo, SP -- Brazil
+\email{thomaz.barboza@sou.inteli.edu.br}
+}
+% TODO: Fill in the coauthors' emails and confirm their affiliations.
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This paper presents a crypto-agility roadmap for cryptographic migration in hybrid three-tier enterprise environments under quantum risk. The method integrates CBOM/SBOM inventory, policy-driven decisions, controlled algorithm replacement, canary deployment, observability, rollback, and evidence retention, aligned with NIST guidance and FIPS 203, 204, and 205. Validation was performed in a simulated banking topology with eight logical nodes running under rootless Podman. In the revalidation, baseline S4-T01 processed 150 requests without failures and achieved a 39.71~ms p95, while canary S4-T02 processed 40 requests without failures and achieved a 24.70~ms p95. A controlled operational comparison using the same route, 5 VUs, and 30~s produced p95 latencies of 42.58~ms for the baseline and 27.20~ms for the canary. Under stress, 10,000 requests completed without HTTP failures, but the 1149.64~ms p95 violated the LAT-01 SLO. Simulated mock-vault/KMS unavailability produced HTTP~500, followed by recovery to HTTP~200 after restart. The evidence strengthens the operational feasibility of the roadmap, but it does not demonstrate real mTLS, a real KMS, or PQC primitives in the dataplane.
+\end{abstract}
+
+\noindent\textbf{Keywords:} Crypto-agility; post-quantum cryptography; CBOM; SBOM; three-tier architecture; NIST; cryptographic migration.
+
+\section{Introduction}
+The evolution of quantum computing increases the risk associated with prolonged use of public-key cryptography based on factorization and discrete logarithms. Beyond future losses of confidentiality and authenticity, organizations must consider \textit{harvest-now, decrypt-later} attacks, in which encrypted data is collected today for later decryption \sbcshortcite{Mosca 2018; NCCoE 2023}{mosca2018,nist1800b}.
+
+In hybrid enterprise environments, migration is not limited to replacing one library or algorithm. Cryptographic dependencies are distributed across TLS termination, applications, APIs, databases, certificates, secrets, pipelines, and legacy components. Without reliable inventory, versioned policies, observability, and reversal mechanisms, a change may introduce incompatibility, unavailability, or loss of traceability.
+
+The practical gap investigated in this work is how to organize an incremental transition in a hybrid three-tier architecture while retaining evidence to decide, deploy, observe, and reverse changes. The contribution is a reproducible CBOM-driven crypto-agility roadmap associated with a policy gateway and validated in a simulated banking topology. This paper does not claim that post-quantum algorithms were executed in the dataplane; it evaluates the operational and governance infrastructure that precedes such adoption.
+
+\section{Background}
+\subsection{Quantum risk and standardization}
+NIST is coordinating the transition to post-quantum cryptography and has published standards for key encapsulation and digital signatures. FIPS~203 specifies ML-KEM, FIPS~204 specifies ML-DSA, and FIPS~205 specifies SLH-DSA \sbcshortcite{NIST 2024a, 2024b, 2024c}{fips203,fips204,fips205}. Research on CRYSTALS-Kyber, the precursor to ML-KEM, illustrates primitive-level security and performance analysis \sbcshortcite{Bos et al. 2018}{bos2018}. These standards and studies do not independently solve discovery of current usage, compatibility, key governance, or operational validation.
+
+\subsection{Crypto-agility, CBOM, and SBOM}
+Crypto-agility is the ability to identify, replace, and govern cryptographic mechanisms without redesigning the entire system. A CBOM complements an SBOM by recording algorithms, protocols, parameters, libraries, certificates, and usage locations. CBOMkit and CBOM support in the CycloneDX ecosystem provide foundations for structured inventory \cite{ibm-cbom,cbomkit,cyclonedx-cbom}. In this work, the CBOM is the decision process input, and its integrity is verified before automation.
+
+\subsection{Cryptographic providers and governance}
+CryptoAPI/CSP and CNG on Windows, JCA on Java, and PKCS~\#11 for tokens and HSMs decouple applications from concrete implementations and expose services such as encryption, signatures, hashes, key generation, certificates, and access to protected material \sbcshortcite{Microsoft 2021, 2025; Oracle 2025; OASIS 2023}{microsoft-csp,microsoft-cng,oracle-jca,oasis-pkcs11}. FIPS~140-3 defines security requirements for cryptographic modules \sbcshortcite{NIST 2019}{fips1403}. The proposal shares this abstraction principle but is not a CSP: it does not implement primitives. Its role is to govern a higher migration layer by discovering dependencies, applying policies, controlling canary deployments, and retaining evidence.
+
+\subsection{Incremental migration and resilience}
+Canary deployments limit the blast radius of changes. Policies, feature flags, SLOs, and rollback controls allow rollout expansion to stop when failures or regressions appear. For cryptographic migration, this cycle should retain before/after manifests, decisions, telemetry, and recovery records. Hybrid classical+PQC profiles are a transition strategy, but their effectiveness and overhead must be measured in a dataplane that actually executes the corresponding primitives.
+
+\section{Related Work}
+NIST/NCCoE structures discovery, interoperability, and transition planning \sbcshortcite{NIST 2023, 2025}{nist1800b,nist1800c,nist-cswp39}. CycloneDX standardizes representation of cryptographic assets, while CBOMkit adds scanning, visualization, and compliance checks \sbcshortcite{OWASP 2026; CBOMkit 2026}{cyclonedx-cbom,cbomkit}. Academic studies propose dependency analysis, systematize the concept of crypto-agility, and discuss centralized governance \sbcshortcite{Hasan et al. 2023; N\"ather et al. 2024; Cho et al. 2024}{hasan2023,naether2024,cho2024}. Table~\ref{tab:related-en} summarizes the positioning.
+
+\begin{table}[ht]
+\centering
+\caption{Summary of related approaches}
+\label{tab:related-en}
+\scriptsize
+\begin{tabularx}{\textwidth}{p{0.20\textwidth}p{0.27\textwidth}Y}
+\toprule
+\textbf{Approach} & \textbf{Primary delivery} & \textbf{Limitation relative to this proposal} \\
+\midrule
+CSP/CNG/JCA/\newline PKCS~\#11/HSM & APIs, algorithms, keys, and protected operations. & Does not independently inventory or govern distributed migration. \\
+NIST/NCCoE & Guidance, discovery, and interoperability testing. & Requires local implementation and operational evidence. \\
+CycloneDX/CBOM & Structured representation of cryptographic assets. & Does not decide rollout, canary, stress, or recovery. \\
+CBOMkit & Discovery, visualization, and compliance. & Does not alone cover the full canary--SLO--recovery cycle. \\
+Migration literature & Conceptual models and dependency analysis. & Experimental evidence in three-tier settings remains limited. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The contribution combines inventory, decisions, operational validation, and evidence retention in a reproducible three-tier topology. Validation remains limited to what the artifacts demonstrate: it does not measure the cryptographic overhead of ML-KEM, ML-DSA, mTLS, or a production KMS.
+
+\section{Methodology}
+\subsection{Research design}
+An applied and exploratory study was conducted as a quantitative case study in a controlled environment. Primary sources included repository manifests and prototypes, k6 scripts, topology files, execution logs, and the June 10, 2026 revalidation package. The unit of analysis was the behavior of the three-tier chain and its governance controls during nominal scenarios, a controlled comparison, stress, and a security-dependency failure.
+
+\subsection{Environment and instrumentation}
+The environment ran on an academic Ubuntu~24.04.3~LTS server with 64~vCPUs, 125~GiB of RAM, and rootless Podman~4.9.3 \cite{podman}. k6 generated load from a dedicated logical node. HTTP responses, JSON summaries, container logs, event counters, and CBOM gateway outputs were retained as evidence. The workload used synthetic data and the functional \texttt{/chain} route.
+
+\subsection{Scenarios and criteria}
+The scenarios were organized into four groups:
+\begin{itemize}
+\item \textbf{Nominal:} S4-T01 (baseline), S4-T02 (canary node), and S4-T03 (functional app--security--data--canary chain).
+\item \textbf{Controlled comparison:} S4-COMP, with baseline and canary on the same route, 5 VUs, 30~s, and 150 requests per node.
+\item \textbf{Stress:} S4-E03, with 50 VUs and 10,000 synthetic transactions.
+\item \textbf{Dependency failure:} S4-E01, with the stop and restart of \texttt{security-integration-node}, which implements a simulated mock-vault/KMS.
+\end{itemize}
+
+The main variables were HTTP failure rate, iteration count, mean latency, p95, maximum latency, availability during failure, and recovery after restart. The LAT-01 SLO requires p95 below 150~ms. Functional availability was accepted when requests completed successfully over HTTP; recovery was characterized by the return to HTTP~200 after the dependency was restored.
+
+\section{Proposed Architecture and Roadmap}
+\subsection{Eight-node topology}
+The topology represents web, application, and data tiers, plus control, security, observability, and load-generation roles. Table~\ref{tab:nodes-en} summarizes the nodes.
+
+\begin{table}[ht]
+\centering
+\caption{Logical nodes in the experimental topology}
+\label{tab:nodes-en}
+\small
+\begin{tabularx}{\textwidth}{p{0.30\textwidth}Y}
+\toprule
+\textbf{Node} & \textbf{Role} \\
+\midrule
+\texttt{k8s-control} & Control and execution of CBOM/policy prototypes. \\
+\texttt{k8s-worker-1} & Web entry point and operational baseline. \\
+\texttt{k8s-worker-2} & Application and security/data chaining. \\
+\texttt{k8s-worker-3} & Application replica marked as canary. \\
+\texttt{data-node} & PostgreSQL and synthetic event records. \\
+\texttt{security-}\newline\texttt{integration-node} & HTTP simulated mock-vault/KMS service. \\
+\texttt{observability-node} & Prometheus planned for metrics; it showed an operational failure. \\
+\texttt{load-chaos-node} & Load generation and failure induction. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Crypto-agility flow}
+The roadmap has five stages. \textit{Discover} records cryptographic dependencies per service in a CBOM. \textit{Decide} applies gateway policies, classifies risk, and defines a target profile. \textit{Migrate} deploys a scoped canary change with a defined reversal path. \textit{Validate} uses telemetry and tests to check availability, latency, and compliance. \textit{Consolidate} links evidence to the decision before rollout expansion.
+
+The gateway prototype processed a three-component CBOM and identified two high-risk findings, two policy violations, and two migration actions. In the complementary/local S4-E04 evidence, a tampered manifest could reduce recommended actions; adding HMAC-SHA256 blocked the invalid artifact before automation. This symmetric signature is a prototype control, not a replacement for enterprise signing and key-management infrastructure. S4-E04 is not part of the principal revalidation package, and its final server reexecution remains pending.
+
+\section{Experimental Execution}
+S4-T01 and S4-T02 revalidated the baseline and canary endpoints under different nominal loads. S4-T03 performed a functional call from the application node, queried the mock-vault, wrote to the database, and reached the canary node. Although the historical S4-T03 identifier was associated with mTLS in the experiment plan, current evidence uses \texttt{http://security-integration-node:8080/secret}; therefore, the result validates only functional chaining.
+
+S4-COMP was created to remove the limitation of the previous comparison between different loads. Both nodes received the same route, load, duration, and request count. S4-E03 compressed 10,000 transactions into a 50-VU run. S4-E01 recorded the state before, during, and after manually stopping the security service.
+
+\section{Results}
+\subsection{Consolidated view}
+Table~\ref{tab:main-results-en} presents the six requested revalidated scenarios. S4-T05 and S4-E04 remain supporting governance evidence in the preceding section.
+
+\begin{table}[ht]
+\centering
+\caption{Consolidated revalidation results}
+\label{tab:main-results-en}
+\small
+\begin{tabularx}{\textwidth}{p{0.14\textwidth}Yp{0.20\textwidth}}
+\toprule
+\textbf{Scenario} & \textbf{Observed evidence} & \textbf{Status} \\
+\midrule
+S4-T01 & 150 requests/iterations; 0 failures; mean 30.36~ms; p95 39.71~ms. & Approved \\
+S4-T02 & 40 requests/iterations; 0 failures; mean 20.43~ms; p95 24.70~ms. & Approved \\
+S4-T03 & App--mock-vault--database--canary chain; HTTP~200; 51.17~ms; database \texttt{ok=true}. & Functionally approved \\
+S4-COMP & Same route/load; 150+150 requests; 0 failures; p95 42.58 vs. 27.20~ms. & Approved \\
+S4-E03 & 10,000 requests; 0 failures; mean 203.47~ms; p95 1149.64~ms. & Availability approved; LAT-01 failed \\
+S4-E01 & HTTP~200 before, HTTP~500 during failure, and HTTP~200 after restart. & Partially approved \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+In nominal scenarios, S4-T01 and S4-T02 remained below LAT-01 and had no HTTP failures. In S4-T03, the response recorded \texttt{security.secret\_profile=mock-vault}, \texttt{database.ok=true}, and \texttt{elapsed\_ms=51.17}. Real mTLS cannot be inferred because the security dependency was accessed over HTTP.
+
+\subsection{Controlled operational comparison}
+\begin{table}[ht]
+\centering
+\caption{S4-COMP: baseline and canary under the same conditions}
+\label{tab:comp-en}
+\small
+\begin{tabularx}{\textwidth}{Yrrr}
+\toprule
+\textbf{Metric} & \textbf{Baseline} & \textbf{Canary} & \textbf{Change} \\
+\midrule
+VUs / duration & 5 / 30~s & 5 / 30~s & -- \\
+Requests & 150 & 150 & -- \\
+HTTP failures & 0 & 0 & -- \\
+Mean latency & 31.13~ms & 19.87~ms & -36.19\% \\
+p95 latency & 42.58~ms & 27.20~ms & -36.12\% \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The canary node had lower latency in this controlled run. Equal route, load, duration, and sample size correct the limitation of the nominal S4-T01/S4-T02 comparison. However, the difference cannot be interpreted as PQC/mTLS overhead or improvement because both nodes run simulated HTTP services and there is no evidence of PQC primitives in the dataplane.
+
+\subsection{Stress with 10,000 transactions}
+\begin{table}[ht]
+\centering
+\caption{S4-E03: compressed load on \texttt{/chain}}
+\label{tab:stress-en}
+\small
+\begin{tabularx}{\textwidth}{Yp{0.28\textwidth}}
+\toprule
+\textbf{Metric} & \textbf{Result} \\
+\midrule
+VUs / completed requests & 50 / 10,000 \\
+HTTP failures & 0 (0.00\%) \\
+Mean latency & 203.47~ms \\
+p95 latency & 1149.64~ms \\
+Maximum latency & 6235.52~ms \\
+Functional availability & Approved \\
+LAT-01: p95 $<$ 150~ms & Failed \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The architecture maintained functional availability under compressed load and completed 10,000 requests without HTTP failures. However, tail latency degraded materially and violated LAT-01. This result must not be hidden or aggregated with nominal scenarios: it identifies a performance limit in the evaluated configuration.
+
+\subsection{Mock-vault failure and recovery}
+\begin{table}[ht]
+\centering
+\caption{S4-E01: simulated mock-vault/KMS unavailability}
+\label{tab:kms-en}
+\small
+\begin{tabularx}{\textwidth}{p{0.17\textwidth}p{0.15\textwidth}p{0.20\textwidth}Y}
+\toprule
+\textbf{Phase} & \textbf{HTTP} & \textbf{Client latency} & \textbf{Evidence} \\
+\midrule
+Before & 200 & 40.09~ms & \texttt{mock-vault}; database OK; \texttt{event\_count=11500}. \\
+During & 500 & 18.21~ms & Security node stopped; DNS error \texttt{Name or service not known}. \\
+After & 200 & 36.25~ms & Mock-vault recovered; database OK; \texttt{event\_count=11501}. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+The experiment demonstrated failure detection and operational recovery after restart. It did not demonstrate full fault tolerance: during unavailability, the application returned HTTP~500 and did not maintain a successful response. It was also not a real KMS; the service returns a static mock-vault profile.
+
+\section{Discussion}
+The nominal scenarios indicate that the simulated topology supports the web--application--data flow with low latency and no failures in the evaluated windows. S4-COMP strengthens the analysis by controlling route, concurrency, duration, and sample size. Even so, the canary's better result describes an operational difference between nodes, not a cryptographic effect.
+
+S4-E03 showed that availability and performance must be evaluated separately. The absence of HTTP failures might suggest robustness, but a p95 above one second violates the SLO and exposes saturation or contention that requires additional instrumentation. S4-E01 showed simple recovery after restart, but propagation of HTTP~500 reveals the absence of caching, fallback, or controlled degradation for the security dependency.
+
+Runtime records classified several containers as \texttt{unhealthy}, and the observability node exited with an error in one capture. Nevertheless, functional endpoints responded during the tests. This divergence indicates inconsistent healthchecks or Compose-provider integration; it must not be interpreted as fully validated operational health. Prometheus/Grafana observability remains incomplete.
+
+\section{Limitations}
+\begin{enumerate}
+\item The environment is a single academic server running rootless Podman, not a distributed enterprise or production deployment.
+\item The simulated mock-vault/KMS does not perform real KMS, HSM, rotation, or envelope-encryption operations.
+\item The S4-T03 chain uses HTTP; real mTLS and hybrid handshakes were not demonstrated.
+\item The artifacts recommend post-quantum profiles but do not demonstrate ML-KEM, ML-DSA, or SLH-DSA in the dataplane.
+\item S4-COMP is an operational node comparison, not a measurement of cryptographic overhead.
+\item S4-E03 violated LAT-01 under stress, and complete CPU, memory, and queue series were not collected to explain the degradation.
+\item S4-E01 returned HTTP~500 during failure; recovery after restart is not equivalent to high availability.
+\item Healthchecks were inconsistent, and the observability stack did not remain fully operational.
+\item The topology size, configuration, and single execution of each scenario limit generalization and statistical inference.
+\item Real rotation, expired-certificate handling, automated rollback, cost analysis, and cryptographic telemetry remain pending.
+\end{enumerate}
+
+\section{Threats to Validity}
+\textbf{Construct validity.} HTTP latency and success rate represent operational behavior but do not directly measure post-quantum security. Historical scenario names may suggest hybrid TLS or KMS; interpretation was restricted to the observed protocol and code.
+
+\textbf{Internal validity.} Runs occurred on a shared host and may be influenced by scheduling, caches, database behavior, and connection creation. The lack of independent repetitions prevents confidence intervals. In S4-E01, recovery was induced manually.
+
+\textbf{External validity.} Eight logical containers do not reproduce inter-region latency, load balancers, HSMs, service meshes, or the client diversity of a real bank. Results should not be directly extrapolated to production.
+
+\textbf{Conclusion validity.} The S4-COMP latency difference is descriptive for one run. Without repetitions, randomization, and resource control, causality cannot be attributed to the canary condition.
+
+\section{Reproducibility}
+Revalidation artifacts are organized under \texttt{docs/revalidation/} and in \texttt{revalidation-evidence-2026-06-10.tgz}. The directory contains the consolidated summary, k6 JSON summaries and outputs, the S4-T03 response, the S4-COMP comparison, stress results, the three S4-E01 phases, and runtime captures. Load scripts and topology files are in \texttt{lab/topology/}; the gateway and CBOM manifests are in \texttt{code/}. Rigorous replication should record image versions, host state, execution time, random seeds when applicable, and at least three independent repetitions per scenario.
+
+\section{Conclusion}
+This work delivers a practical crypto-agility roadmap connecting CBOM inventory, policies, canary deployment, observability, rollback, and evidence. Revalidation strengthens the proposal by confirming nominal baseline and canary behavior, adding a controlled operational comparison, executing 10,000 transactions under stress, and observing mock-vault failure and recovery.
+
+The results also delimit the contribution. LAT-01 was violated under stress; the application returned HTTP~500 during security-service unavailability; and real mTLS, a real KMS, and PQC in the dataplane were not demonstrated. Next steps are to deploy real mTLS, integrate a realistic KMS/HSM, execute FIPS~203--205 primitives in the dataplane, automate rollback, repair Prometheus/Grafana, repeat experiments with statistical analysis, and evaluate a cloud environment or a more robust production-like simulation.
+
+\section*{Artifact Availability}
+Code, scripts, topology files, CBOM manifests, and evidence are available in the repository, mainly under \texttt{code/}, \texttt{lab/topology/}, \texttt{docs/module14/}, \texttt{docs/module16/}, and \texttt{docs/revalidation/}. Workloads are synthetic and contain no real banking data.
+
+\bibliographystyle{../Template_SBC/template-latex/sbc}
+\bibliography{../tcc/references}
+
+\end{document}

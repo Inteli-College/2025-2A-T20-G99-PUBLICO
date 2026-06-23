@@ -1,0 +1,27 @@
+{
+  "node": "k8s-worker-2",
+  "role": "app",
+  "canary": "baseline",
+  "security": {
+    "node": "security-integration-node",
+    "role": "security",
+    "secret_profile": "mock-vault",
+    "rotation_policy_days": 90,
+    "token_ttl_minutes": 30
+  },
+  "database": {
+    "enabled": true,
+    "ok": true,
+    "created_at": "2026-06-10T18:46:12.338526+00:00",
+    "event_count": 859
+  },
+  "next": {
+    "node": "k8s-worker-3",
+    "role": "app-canary",
+    "canary": "canary",
+    "next_url": null,
+    "security_url": "http://security-integration-node:8080/secret",
+    "db_enabled": true
+  },
+  "elapsed_ms": 51.17
+}

@@ -1,0 +1,271 @@
+\documentclass[12pt]{article}
+
+\makeatletter
+\def\@currname{sbc-template}
+\def\@currext{sty}
+\input{../Template_SBC/template-latex/sbc-template.sty}
+\makeatother
+
+\usepackage{graphicx,url}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+
+\sloppy
+\newcommand{\sbcshortcite}[2]{[#1]\nocite{#2}}
+\newcolumntype{Y}{>{\raggedright\arraybackslash}X}
+
+\title{Criptoagilidade Orientada por CBOM para Migra\c{c}\~ao P\'os-Qu\^antica em Ambientes H\'ibridos Three-Tier\\
+M\'etodo e Valida\c{c}\~ao Experimental em Topologia Banc\'aria Simulada}
+
+% TODO: Substituir "Hayashi" pelo nome completo do autor, se aplic\'avel.
+\author{Thomaz Klifson Falc\~ao Barboza\inst{1}, Reginaldo Arakaki\inst{1}, Hayashi\inst{1}}
+
+\address{Inteli -- Instituto de Tecnologia e Lideran\c{c}a\\
+S\~ao Paulo, SP -- Brasil
+\email{thomaz.barboza@sou.inteli.edu.br}
+}
+% TODO: Preencher os e-mails e confirmar as afilia\c{c}\~oes dos coautores.
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Este artigo apresenta um roteiro de criptoagilidade para migra\c{c}\~ao criptogr\'afica em ambientes corporativos h\'ibridos three-tier sob risco qu\^antico. O m\'etodo integra invent\'ario CBOM/SBOM, decis\~ao orientada por pol\'iticas, substitui\c{c}\~ao controlada de algoritmos, implanta\c{c}\~ao can\'aria, observabilidade, rollback e reten\c{c}\~ao de evid\^encias, em alinhamento com guias do NIST e com os padr\~oes FIPS 203, 204 e 205. A valida\c{c}\~ao foi conduzida em uma topologia banc\'aria simulada com oito n\'os l\'ogicos executados em Podman rootless. Na revalida\c{c}\~ao, o baseline S4-T01 processou 150 requisi\c{c}\~oes sem falhas, com p95 de 39{,}71~ms, e o can\'ario S4-T02 processou 40 requisi\c{c}\~oes sem falhas, com p95 de 24{,}70~ms. Uma compara\c{c}\~ao operacional controlada, com mesma rota, 5 VUs e 30~s, apresentou p95 de 42{,}58~ms no baseline e 27{,}20~ms no can\'ario. Sob stress, 10.000 requisi\c{c}\~oes foram conclu\'idas sem falhas HTTP, por\'em o p95 de 1149{,}64~ms violou o SLO LAT-01. A indisponibilidade do mock-vault/KMS simulado produziu HTTP~500 e, ap\'os rein\'icio, recupera\c{c}\~ao para HTTP~200. As evid\^encias fortalecem a viabilidade operacional do roteiro, mas n\~ao comprovam mTLS real, KMS real nem PQC no dataplane.
+\end{abstract}
+
+\noindent\textbf{Palavras-chave:} Criptoagilidade; criptografia p\'os-qu\^antica; CBOM; SBOM; arquitetura three-tier; NIST; migra\c{c}\~ao criptogr\'afica.
+
+\section{Introdu\c{c}\~ao}
+A evolu\c{c}\~ao da computa\c{c}\~ao qu\^antica amplia o risco associado ao uso prolongado de criptografia de chave p\'ublica baseada em fatora\c{c}\~ao e logaritmo discreto. Al\'em da futura quebra de confidencialidade e autenticidade, organiza\c{c}\~oes precisam considerar ataques do tipo \textit{harvest-now, decrypt-later}, nos quais dados cifrados s\~ao coletados hoje para decifra\c{c}\~ao posterior \sbcshortcite{Mosca 2018; NCCoE 2023}{mosca2018,nist1800b}.
+
+Em ambientes corporativos h\'ibridos, a migra\c{c}\~ao n\~ao se reduz \`a troca de uma biblioteca ou de um algoritmo. Depend\^encias criptogr\'aficas est\~ao distribu\'idas entre termina\c{c}\~oes TLS, aplica\c{c}\~oes, APIs, bancos de dados, certificados, segredos, pipelines e componentes legados. Sem invent\'ario confi\'avel, pol\'iticas versionadas, observabilidade e mecanismos de revers\~ao, uma altera\c{c}\~ao pode introduzir incompatibilidade, indisponibilidade ou perda de rastreabilidade.
+
+A lacuna pr\'atica investigada neste trabalho \'e como organizar uma transi\c{c}\~ao incremental em uma arquitetura three-tier h\'ibrida, mantendo evid\^encias para decidir, implantar, observar e reverter mudan\c{c}as. A contribui\c{c}\~ao \'e um roteiro reprodut\'ivel de criptoagilidade orientado por CBOM, associado a um gateway de pol\'iticas e validado em uma topologia banc\'aria simulada. O artigo n\~ao afirma que algoritmos p\'os-qu\^anticos foram executados no dataplane; avalia-se a infraestrutura operacional e de governan\c{c}a que antecede essa ado\c{c}\~ao.
+
+\section{Fundamenta\c{c}\~ao}
+\subsection{Risco qu\^antico e padroniza\c{c}\~ao}
+O NIST conduz a transi\c{c}\~ao para criptografia p\'os-qu\^antica e publicou padr\~oes para encapsulamento de chaves e assinaturas digitais. O FIPS~203 especifica ML-KEM, o FIPS~204 especifica ML-DSA e o FIPS~205 especifica SLH-DSA \sbcshortcite{NIST 2024a, 2024b, 2024c}{fips203,fips204,fips205}. A literatura sobre CRYSTALS-Kyber, precursor de ML-KEM, ilustra o n\'ivel de an\'alise de seguran\c{c}a e desempenho da primitiva \sbcshortcite{Bos et al. 2018}{bos2018}. Esses padr\~oes e estudos n\~ao resolvem, por si s\'o, descoberta de usos existentes, compatibilidade, governan\c{c}a de chaves e valida\c{c}\~ao operacional.
+
+\subsection{Criptoagilidade, CBOM e SBOM}
+Criptoagilidade \'e a capacidade de identificar, substituir e governar mecanismos criptogr\'aficos sem redesenhar integralmente o sistema. Um CBOM complementa o SBOM ao registrar algoritmos, protocolos, par\^ametros, bibliotecas, certificados e pontos de uso. O CBOMkit e o suporte a CBOM no ecossistema CycloneDX oferecem bases para invent\'ario estruturado \cite{ibm-cbom,cbomkit,cyclonedx-cbom}. Neste trabalho, o CBOM \'e a entrada do processo de decis\~ao, e sua integridade \'e verificada antes de qualquer automa\c{c}\~ao.
+
+\subsection{Provedores criptogr\'aficos e governan\c{c}a}
+CryptoAPI/CSP e CNG no Windows, JCA no Java e PKCS~\#11 para tokens e HSMs desacoplam aplica\c{c}\~oes de implementa\c{c}\~oes concretas e oferecem servi\c{c}os como cifra, assinatura, hash, gera\c{c}\~ao de chaves, certificados e acesso a material protegido \sbcshortcite{Microsoft 2021, 2025; Oracle 2025; OASIS 2023}{microsoft-csp,microsoft-cng,oracle-jca,oasis-pkcs11}. O FIPS~140-3, por sua vez, define requisitos de seguran\c{c}a para m\'odulos criptogr\'aficos \sbcshortcite{NIST 2019}{fips1403}. A proposta compartilha a ideia de abstra\c{c}\~ao, mas n\~ao \'e um CSP: ela n\~ao implementa primitivas. Sua fun\c{c}\~ao \'e governar uma camada superior da migra\c{c}\~ao, descobrindo depend\^encias, aplicando pol\'iticas, controlando can\'arios e preservando evid\^encias.
+
+\subsection{Migra\c{c}\~ao incremental e resili\^encia}
+Implanta\c{c}\~oes can\'arias limitam o raio de impacto de mudan\c{c}as. Pol\'iticas, feature flags, SLOs e rollback permitem interromper a expans\~ao quando surgem falhas ou regress\~oes. Para migra\c{c}\~ao criptogr\'afica, esse ciclo deve conservar manifestos antes/depois, decis\~oes, telemetria e registros de recupera\c{c}\~ao. Perfis h\'ibridos cl\'assico+PQC s\~ao uma estrat\'egia de transi\c{c}\~ao, mas sua efic\'acia e seu overhead precisam ser medidos em um dataplane que realmente execute as primitivas correspondentes.
+
+\section{Trabalhos Relacionados}
+O NIST/NCCoE organiza descoberta, interoperabilidade e planejamento da transi\c{c}\~ao \sbcshortcite{NIST 2023, 2025}{nist1800b,nist1800c,nist-cswp39}. CycloneDX padroniza a representa\c{c}\~ao dos ativos, e CBOMkit acrescenta varredura, visualiza\c{c}\~ao e verifica\c{c}\~oes de conformidade \sbcshortcite{OWASP 2026; CBOMkit 2026}{cyclonedx-cbom,cbomkit}. Estudos acad\^emicos prop\~oem an\'alise de depend\^encias, sistematizam o conceito de criptoagilidade e discutem governan\c{c}a centralizada \sbcshortcite{Hasan et al. 2023; N\"ather et al. 2024; Cho et al. 2024}{hasan2023,naether2024,cho2024}. A Tabela~\ref{tab:related-pt} sintetiza o posicionamento.
+
+\begin{table}[ht]
+\centering
+\caption{S\'intese das abordagens relacionadas}
+\label{tab:related-pt}
+\scriptsize
+\begin{tabularx}{\textwidth}{p{0.20\textwidth}p{0.27\textwidth}Y}
+\toprule
+\textbf{Abordagem} & \textbf{Entrega principal} & \textbf{Limita\c{c}\~ao diante da proposta} \\
+\midrule
+CSP/CNG/JCA/\newline PKCS~\#11/HSM & APIs, algoritmos, chaves e opera\c{c}\~oes protegidas. & N\~ao inventaria nem governa sozinho a migra\c{c}\~ao distribu\'ida. \\
+NIST/NCCoE & Diretrizes, descoberta e testes de interoperabilidade. & Requer implementa\c{c}\~ao e evid\^encia operacional local. \\
+CycloneDX/CBOM & Representa\c{c}\~ao estruturada de ativos criptogr\'aficos. & N\~ao decide rollout, can\'ario, stress ou recupera\c{c}\~ao. \\
+CBOMkit & Descoberta, visualiza\c{c}\~ao e conformidade. & N\~ao cobre, isoladamente, todo o ciclo can\'ario--SLO--recupera\c{c}\~ao. \\
+Literatura de migra\c{c}\~ao & Modelos conceituais e an\'alise de depend\^encias. & Evid\^encia experimental three-tier ainda \'e limitada. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+O diferencial \'e combinar invent\'ario, decis\~ao, valida\c{c}\~ao operacional e reten\c{c}\~ao de evid\^encias em uma topologia three-tier reprodut\'ivel. A valida\c{c}\~ao permanece limitada ao que os artefatos demonstram: n\~ao se mede o overhead criptogr\'afico de ML-KEM, ML-DSA, mTLS ou KMS de produ\c{c}\~ao.
+
+\section{Metodologia}
+\subsection{Desenho da pesquisa}
+Foi conduzida pesquisa aplicada e explorat\'oria, com estudo de caso quantitativo em ambiente controlado. As fontes prim\'arias foram os manifestos e prot\'otipos do reposit\'orio, os scripts k6, os arquivos de topologia, os logs de execu\c{c}\~ao e o pacote de revalida\c{c}\~ao de 10 de junho de 2026. A unidade de an\'alise foi o comportamento da cadeia three-tier e de seus controles de governan\c{c}a durante cen\'arios nominais, compara\c{c}\~ao controlada, stress e falha de depend\^encia.
+
+\subsection{Ambiente e instrumenta\c{c}\~ao}
+O ambiente foi executado em servidor acad\^emico Ubuntu~24.04.3~LTS, com 64~vCPU, 125~GiB de RAM e Podman~4.9.3 em modo rootless \cite{podman}. O k6 gerou carga a partir de um n\'o l\'ogico dedicado. Respostas HTTP, resumos JSON, logs de containers, contadores de eventos e sa\'idas do gateway CBOM foram retidos como evid\^encia. A carga empregou dados sint\'eticos e a rota funcional \texttt{/chain}.
+
+\subsection{Cen\'arios e crit\'erios}
+Os cen\'arios foram organizados em quatro grupos:
+\begin{itemize}
+\item \textbf{Nominais:} S4-T01 (baseline), S4-T02 (n\'o can\'ario) e S4-T03 (cadeia funcional app--seguran\c{c}a--dados--can\'ario).
+\item \textbf{Compara\c{c}\~ao controlada:} S4-COMP, com baseline e can\'ario na mesma rota, 5 VUs, 30~s e 150 requisi\c{c}\~oes por n\'o.
+\item \textbf{Stress:} S4-E03, com 50 VUs e 10.000 transa\c{c}\~oes sint\'eticas.
+\item \textbf{Falha de depend\^encia:} S4-E01, com parada e rein\'icio do \texttt{security-integration-node}, que implementa um mock-vault/KMS simulado.
+\end{itemize}
+
+As vari\'aveis principais foram taxa de falha HTTP, n\'umero de itera\c{c}\~oes, lat\^encia m\'edia, p95, lat\^encia m\'axima, disponibilidade durante a falha e recupera\c{c}\~ao ap\'os rein\'icio. O SLO LAT-01 exige p95 inferior a 150~ms. Considerou-se disponibilidade funcional quando as requisi\c{c}\~oes foram conclu\'idas com sucesso HTTP; recupera\c{c}\~ao foi caracterizada pelo retorno a HTTP~200 ap\'os restaura\c{c}\~ao da depend\^encia.
+
+\section{Arquitetura e Roteiro Proposto}
+\subsection{Topologia de oito n\'os}
+A topologia representa camadas web, aplica\c{c}\~ao e dados, acrescidas de controle, seguran\c{c}a, observabilidade e gera\c{c}\~ao de carga. A Tabela~\ref{tab:nodes-pt} resume os pap\'eis.
+
+\begin{table}[ht]
+\centering
+\caption{N\'os l\'ogicos da topologia experimental}
+\label{tab:nodes-pt}
+\small
+\begin{tabularx}{\textwidth}{p{0.30\textwidth}Y}
+\toprule
+\textbf{N\'o} & \textbf{Papel} \\
+\midrule
+\texttt{k8s-control} & Controle e execu\c{c}\~ao dos prot\'otipos CBOM/pol\'iticas. \\
+\texttt{k8s-worker-1} & Entrada web e baseline operacional. \\
+\texttt{k8s-worker-2} & Aplica\c{c}\~ao e encadeamento de seguran\c{c}a/dados. \\
+\texttt{k8s-worker-3} & R\'eplica de aplica\c{c}\~ao marcada como can\'ario. \\
+\texttt{data-node} & PostgreSQL e registro de eventos sint\'eticos. \\
+\texttt{security-}\newline\texttt{integration-node} & Servi\c{c}o HTTP de mock-vault/KMS simulado. \\
+\texttt{observability-node} & Prometheus previsto para m\'etricas; apresentou falha operacional. \\
+\texttt{load-chaos-node} & Gera\c{c}\~ao de carga e indu\c{c}\~ao de falhas. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Fluxo de criptoagilidade}
+O roteiro possui cinco etapas. Em \textit{descobrir}, o CBOM registra depend\^encias criptogr\'aficas por servi\c{c}o. Em \textit{decidir}, o gateway aplica pol\'iticas, classifica risco e define um perfil alvo. Em \textit{migrar}, a mudan\c{c}a \'e implantada em can\'ario, com escopo e revers\~ao definidos. Em \textit{validar}, telemetria e testes verificam disponibilidade, lat\^encia e conformidade. Em \textit{consolidar}, as evid\^encias s\~ao vinculadas \`a decis\~ao antes da expans\~ao.
+
+O prot\'otipo de gateway processou um CBOM com tr\^es componentes e identificou dois achados de alto risco, duas viola\c{c}\~oes e duas a\c{c}\~oes de migra\c{c}\~ao. Na evid\^encia complementar/local S4-E04, um manifesto adulterado poderia reduzir as a\c{c}\~oes recomendadas; a inclus\~ao de HMAC-SHA256 passou a bloquear o artefato inv\'alido antes da automa\c{c}\~ao. Essa assinatura sim\'etrica \'e um controle de prot\'otipo, n\~ao uma substitui\c{c}\~ao de uma infraestrutura corporativa de assinatura e gest\~ao de chaves. S4-E04 n\~ao integra o pacote principal de revalida\c{c}\~ao, e sua reexecu\c{c}\~ao final no servidor permanece pendente.
+
+\section{Execu\c{c}\~ao Experimental}
+S4-T01 e S4-T02 revalidaram os endpoints baseline e can\'ario em cargas nominais distintas. S4-T03 executou uma chamada funcional a partir do n\'o de aplica\c{c}\~ao, consultando o mock-vault, gravando no banco e alcan\c{c}ando o n\'o can\'ario. Embora o identificador hist\'orico S4-T03 tenha sido associado a mTLS no plano experimental, a evid\^encia atual usa \texttt{http://security-integration-node:8080/secret}; portanto, o resultado valida apenas o encadeamento funcional.
+
+S4-COMP foi criado para remover a limita\c{c}\~ao da compara\c{c}\~ao anterior entre cargas diferentes. Os dois n\'os receberam a mesma rota, carga, dura\c{c}\~ao e quantidade de requisi\c{c}\~oes. S4-E03 comprimiu 10.000 transa\c{c}\~oes em uma execu\c{c}\~ao com 50 VUs. S4-E01 registrou o estado antes, durante e depois da parada manual do servi\c{c}o de seguran\c{c}a.
+
+\section{Resultados}
+\subsection{Vis\~ao consolidada}
+A Tabela~\ref{tab:main-results-pt} apresenta os seis cen\'arios revalidados solicitados. Os resultados de S4-T05 e S4-E04 foram mantidos como evid\^encias complementares de governan\c{c}a na se\c{c}\~ao anterior.
+
+\begin{table}[ht]
+\centering
+\caption{Resultados consolidados da revalida\c{c}\~ao}
+\label{tab:main-results-pt}
+\small
+\begin{tabularx}{\textwidth}{p{0.14\textwidth}Yp{0.20\textwidth}}
+\toprule
+\textbf{Cen\'ario} & \textbf{Evid\^encia observada} & \textbf{Status} \\
+\midrule
+S4-T01 & 150 requisi\c{c}\~oes/itera\c{c}\~oes; 0 falhas; m\'edia 30{,}36~ms; p95 39{,}71~ms. & Aprovado \\
+S4-T02 & 40 requisi\c{c}\~oes/itera\c{c}\~oes; 0 falhas; m\'edia 20{,}43~ms; p95 24{,}70~ms. & Aprovado \\
+S4-T03 & Cadeia app--mock-vault--banco--can\'ario; HTTP~200; 51{,}17~ms; banco \texttt{ok=true}. & Aprovado funcionalmente \\
+S4-COMP & Mesma rota/carga; 150+150 requisi\c{c}\~oes; 0 falhas; p95 42{,}58 vs. 27{,}20~ms. & Aprovado \\
+S4-E03 & 10.000 requisi\c{c}\~oes; 0 falhas; m\'edia 203{,}47~ms; p95 1149{,}64~ms. & Disponibilidade aprovada; LAT-01 reprovado \\
+S4-E01 & HTTP~200 antes, HTTP~500 durante a falha e HTTP~200 ap\'os rein\'icio. & Parcialmente aprovado \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+Nos cen\'arios nominais, S4-T01 e S4-T02 permaneceram abaixo de LAT-01 e n\~ao apresentaram falhas HTTP. Em S4-T03, a resposta registrou \texttt{security.secret\_profile=mock-vault}, \texttt{database.ok=true} e \texttt{elapsed\_ms=51.17}. N\~ao se pode inferir mTLS real, pois a depend\^encia de seguran\c{c}a foi acessada por HTTP.
+
+\subsection{Compara\c{c}\~ao operacional controlada}
+\begin{table}[ht]
+\centering
+\caption{S4-COMP: baseline e can\'ario sob as mesmas condi\c{c}\~oes}
+\label{tab:comp-pt}
+\small
+\begin{tabularx}{\textwidth}{Yrrr}
+\toprule
+\textbf{M\'etrica} & \textbf{Baseline} & \textbf{Can\'ario} & \textbf{Varia\c{c}\~ao} \\
+\midrule
+VUs / dura\c{c}\~ao & 5 / 30~s & 5 / 30~s & -- \\
+Requisi\c{c}\~oes & 150 & 150 & -- \\
+Falhas HTTP & 0 & 0 & -- \\
+Lat\^encia m\'edia & 31{,}13~ms & 19{,}87~ms & -36{,}19\% \\
+Lat\^encia p95 & 42{,}58~ms & 27{,}20~ms & -36{,}12\% \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+O n\'o can\'ario apresentou menor lat\^encia nessa execu\c{c}\~ao controlada. A igualdade de rota, carga, dura\c{c}\~ao e amostra corrige a limita\c{c}\~ao da compara\c{c}\~ao nominal entre S4-T01 e S4-T02. Entretanto, n\~ao se pode interpretar a diferen\c{c}a como overhead ou ganho de PQC/mTLS, pois os dois n\'os executam servi\c{c}os HTTP simulados e n\~ao h\'a evid\^encia de primitivas PQC no dataplane.
+
+\subsection{Stress com 10.000 transa\c{c}\~oes}
+\begin{table}[ht]
+\centering
+\caption{S4-E03: carga comprimida sobre \texttt{/chain}}
+\label{tab:stress-pt}
+\small
+\begin{tabularx}{\textwidth}{Yp{0.28\textwidth}}
+\toprule
+\textbf{M\'etrica} & \textbf{Resultado} \\
+\midrule
+VUs / requisi\c{c}\~oes conclu\'idas & 50 / 10.000 \\
+Falhas HTTP & 0 (0{,}00\%) \\
+Lat\^encia m\'edia & 203{,}47~ms \\
+Lat\^encia p95 & 1149{,}64~ms \\
+Lat\^encia m\'axima & 6235{,}52~ms \\
+Disponibilidade funcional & Aprovada \\
+LAT-01: p95 $<$ 150~ms & Reprovado \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+A arquitetura manteve disponibilidade funcional sob carga comprimida, concluindo 10.000 requisi\c{c}\~oes sem falhas HTTP. Contudo, a cauda de lat\^encia degradou de forma relevante e violou LAT-01. O resultado n\~ao deve ser ocultado nem agregado aos cen\'arios nominais: ele identifica um limite de desempenho da configura\c{c}\~ao avaliada.
+
+\subsection{Falha e recupera\c{c}\~ao do mock-vault}
+\begin{table}[ht]
+\centering
+\caption{S4-E01: indisponibilidade do mock-vault/KMS simulado}
+\label{tab:kms-pt}
+\small
+\begin{tabularx}{\textwidth}{p{0.17\textwidth}p{0.15\textwidth}p{0.20\textwidth}Y}
+\toprule
+\textbf{Fase} & \textbf{HTTP} & \textbf{Lat\^encia cliente} & \textbf{Evid\^encia} \\
+\midrule
+Antes & 200 & 40{,}09~ms & \texttt{mock-vault}; banco OK; \texttt{event\_count=11500}. \\
+Durante & 500 & 18{,}21~ms & N\'o de seguran\c{c}a parado; erro DNS \texttt{Name or service not known}. \\
+Depois & 200 & 36{,}25~ms & Mock-vault recuperado; banco OK; \texttt{event\_count=11501}. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+O experimento demonstrou detec\c{c}\~ao da falha e recupera\c{c}\~ao operacional ap\'os rein\'icio. Ele n\~ao demonstrou toler\^ancia plena: durante a indisponibilidade, a aplica\c{c}\~ao retornou HTTP~500 e n\~ao manteve resposta bem-sucedida. Tamb\'em n\~ao se trata de KMS real; o servi\c{c}o retorna um perfil est\'atico de mock-vault.
+
+\section{Discuss\~ao}
+Os cen\'arios nominais indicam que a topologia simulada suporta o fluxo web--aplica\c{c}\~ao--dados com baixa lat\^encia e sem falhas nas janelas avaliadas. A compara\c{c}\~ao S4-COMP fortalece a an\'alise porque controla rota, concorr\^encia, dura\c{c}\~ao e tamanho da amostra. Ainda assim, o melhor resultado do can\'ario descreve diferen\c{c}a operacional entre n\'os e n\~ao efeito criptogr\'afico.
+
+S4-E03 mostrou que disponibilidade e desempenho devem ser avaliados separadamente. A aus\^encia de falhas HTTP poderia sugerir robustez, mas o p95 superior a um segundo viola o SLO e exp\~oe satura\c{c}\~ao ou conten\c{c}\~ao que requer instrumenta\c{c}\~ao adicional. S4-E01 mostrou recupera\c{c}\~ao simples ap\'os rein\'icio, mas a propaga\c{c}\~ao de HTTP~500 revela aus\^encia de cache, fallback ou degrada\c{c}\~ao controlada para a depend\^encia de seguran\c{c}a.
+
+Os registros de runtime classificaram diversos containers como \texttt{unhealthy}, e o n\'o de observabilidade encerrou com erro em uma captura. Mesmo assim, os endpoints funcionais responderam durante os testes. Essa diverg\^encia indica healthchecks ou integra\c{c}\~ao com o provider Compose inconsistentes; n\~ao deve ser interpretada como sa\'ude operacional plenamente validada. A observabilidade Prometheus/Grafana permanece incompleta.
+
+\section{Limita\c{c}\~oes}
+\begin{enumerate}
+\item O ambiente \'e uma simula\c{c}\~ao em um \'unico servidor acad\^emico com Podman rootless, n\~ao uma implanta\c{c}\~ao corporativa distribu\'ida ou de produ\c{c}\~ao.
+\item O mock-vault/KMS simulado n\~ao executa opera\c{c}\~oes reais de KMS, HSM, rota\c{c}\~ao ou envelope encryption.
+\item A cadeia S4-T03 usa HTTP; mTLS real e handshakes h\'ibridos n\~ao foram comprovados.
+\item Os artefatos recomendam perfis p\'os-qu\^anticos, mas n\~ao demonstram ML-KEM, ML-DSA ou SLH-DSA no dataplane.
+\item S4-COMP \'e uma compara\c{c}\~ao operacional entre n\'os, n\~ao uma medi\c{c}\~ao de overhead criptogr\'afico.
+\item S4-E03 violou LAT-01 sob stress, e n\~ao foram coletadas s\'eries completas de CPU, mem\'oria e filas para explicar a degrada\c{c}\~ao.
+\item S4-E01 retornou HTTP~500 durante a falha; recupera\c{c}\~ao ap\'os rein\'icio n\~ao equivale a alta disponibilidade.
+\item Os healthchecks foram inconsistentes, e a pilha de observabilidade n\~ao permaneceu integralmente operacional.
+\item O tamanho, a configura\c{c}\~ao e a execu\c{c}\~ao \'unica de cada cen\'ario limitam generaliza\c{c}\~ao e infer\^encia estat\'istica.
+\item Rota\c{c}\~ao real, certificado expirado, rollback automatizado, custo e telemetria criptogr\'afica permanecem pendentes.
+\end{enumerate}
+
+\section{Amea\c{c}as \`a Validade}
+\textbf{Validade de constru\c{c}\~ao.} Lat\^encia HTTP e taxa de sucesso representam comportamento operacional, mas n\~ao medem diretamente seguran\c{c}a p\'os-qu\^antica. Os nomes hist\'oricos dos cen\'arios podem sugerir TLS h\'ibrido ou KMS; a interpreta\c{c}\~ao foi restringida ao protocolo e ao c\'odigo observados.
+
+\textbf{Validade interna.} As execu\c{c}\~oes ocorreram em host compartilhado e podem sofrer influ\^encia de escalonamento, cache, banco e cria\c{c}\~ao de conex\~oes. A aus\^encia de repeti\c{c}\~oes independentes impede intervalos de confian\c{c}a. Em S4-E01, a recupera\c{c}\~ao foi induzida manualmente.
+
+\textbf{Validade externa.} Oito containers l\'ogicos n\~ao reproduzem lat\^encias inter-regi\~ao, balanceadores, HSMs, service mesh ou diversidade de clientes de um banco real. Os resultados n\~ao devem ser extrapolados diretamente para produ\c{c}\~ao.
+
+\textbf{Validade de conclus\~ao.} A diferen\c{c}a de lat\^encia em S4-COMP \'e descritiva para uma execu\c{c}\~ao. Sem repeti\c{c}\~oes, randomiza\c{c}\~ao e controle de recursos, n\~ao se atribui causalidade \`a condi\c{c}\~ao de can\'ario.
+
+\section{Reprodutibilidade}
+Os artefatos de revalida\c{c}\~ao est\~ao organizados em \texttt{docs/revalidation/} e no pacote \texttt{revalidation-evidence-2026-06-10.tgz}. O diret\'orio cont\'em o sum\'ario consolidado, resumos JSON e sa\'idas do k6, a resposta S4-T03, a compara\c{c}\~ao S4-COMP, os resultados de stress, as tr\^es fases de S4-E01 e capturas de runtime. Os scripts de carga e a topologia est\~ao em \texttt{lab/topology/}; o gateway e os manifestos CBOM est\~ao em \texttt{code/}. Para reprodu\c{c}\~ao rigorosa, devem ser registrados vers\~oes de imagens, estado do host, hor\'ario, semente quando aplic\'avel e pelo menos tr\^es repeti\c{c}\~oes independentes por cen\'ario.
+
+\section{Conclus\~ao}
+O trabalho entrega um roteiro pr\'atico de criptoagilidade que conecta invent\'ario CBOM, pol\'iticas, implanta\c{c}\~ao can\'aria, observabilidade, rollback e evid\^encias. A revalida\c{c}\~ao fortalece a proposta ao confirmar baseline e can\'ario nominais, adicionar uma compara\c{c}\~ao operacional controlada, executar 10.000 transa\c{c}\~oes sob stress e observar falha e recupera\c{c}\~ao do mock-vault.
+
+Os resultados tamb\'em delimitam o alcance da contribui\c{c}\~ao. LAT-01 foi violado sob stress; a aplica\c{c}\~ao retornou HTTP~500 durante a indisponibilidade de seguran\c{c}a; mTLS, KMS real e PQC no dataplane n\~ao foram comprovados. Os pr\'oximos passos s\~ao implantar mTLS real, integrar KMS/HSM realista, executar primitivas FIPS~203--205 no dataplane, automatizar rollback, corrigir Prometheus/Grafana, repetir experimentos com an\'alise estat\'istica e avaliar uma infraestrutura cloud ou uma simula\c{c}\~ao de produ\c{c}\~ao mais robusta.
+
+\section*{Disponibilidade de Artefatos}
+O c\'odigo, os scripts, a topologia, os manifestos CBOM e as evid\^encias est\~ao no reposit\'orio, principalmente em \texttt{code/}, \texttt{lab/topology/}, \texttt{docs/module14/}, \texttt{docs/module16/} e \texttt{docs/revalidation/}. As cargas s\~ao sint\'eticas e n\~ao cont\^em dados banc\'arios reais.
+
+\bibliographystyle{../Template_SBC/template-latex/sbc}
+\bibliography{../tcc/references}
+
+\end{document}

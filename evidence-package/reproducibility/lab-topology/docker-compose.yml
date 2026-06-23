@@ -1,0 +1,211 @@
+services:
+  k8s-control:
+    build:
+      context: ./mock-node
+    container_name: k8s-control
+    environment:
+      NODE_NAME: k8s-control
+      NODE_ROLE: control
+      NODE_PORT: "8080"
+      EVIDENCE_DIR: /evidence/runtime
+    volumes:
+      - ../..:/workspace:ro
+      - ./runtime/evidence:/evidence
+    networks:
+      - cluster_net
+      - observability_net
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/health', timeout=2).read()\""]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+
+  k8s-worker-1:
+    build:
+      context: ./mock-node
+    container_name: k8s-worker-1
+    environment:
+      NODE_NAME: k8s-worker-1
+      NODE_ROLE: web
+      NODE_PORT: "8080"
+      NEXT_URL: http://k8s-worker-2:8080/chain
+      EVIDENCE_DIR: /evidence/runtime
+      CANARY_FLAG: baseline
+    volumes:
+      - ./runtime/evidence:/evidence
+    networks:
+      - ingress_net
+      - cluster_net
+      - observability_net
+    ports:
+      - "8080:8080"
+    depends_on:
+      k8s-worker-2:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/health', timeout=2).read()\""]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+
+  k8s-worker-2:
+    build:
+      context: ./mock-node
+    container_name: k8s-worker-2
+    environment:
+      NODE_NAME: k8s-worker-2
+      NODE_ROLE: app
+      NODE_PORT: "8080"
+      NEXT_URL: http://k8s-worker-3:8080/info
+      SECURITY_URL: http://security-integration-node:8080/secret
+      DB_DSN: postgresql://lab:labpass@data-node:5432/three_tier
+      EVIDENCE_DIR: /evidence/runtime
+      CANARY_FLAG: baseline
+    volumes:
+      - ./runtime/evidence:/evidence
+    networks:
+      - cluster_net
+      - data_net
+      - security_net
+      - observability_net
+    depends_on:
+      data-node:
+        condition: service_healthy
+      security-integration-node:
+        condition: service_healthy
+      k8s-worker-3:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/health', timeout=2).read()\""]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+
+  k8s-worker-3:
+    build:
+      context: ./mock-node
+    container_name: k8s-worker-3
+    environment:
+      NODE_NAME: k8s-worker-3
+      NODE_ROLE: app-canary
+      NODE_PORT: "8080"
+      SECURITY_URL: http://security-integration-node:8080/secret
+      DB_DSN: postgresql://lab:labpass@data-node:5432/three_tier
+      EVIDENCE_DIR: /evidence/runtime
+      CANARY_FLAG: canary
+    volumes:
+      - ./runtime/evidence:/evidence
+    networks:
+      - ingress_net
+      - cluster_net
+      - data_net
+      - security_net
+      - observability_net
+    ports:
+      - "8081:8080"
+    depends_on:
+      data-node:
+        condition: service_healthy
+      security-integration-node:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/health', timeout=2).read()\""]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+
+  data-node:
+    image: postgres:latest
+    container_name: data-node
+    environment:
+      POSTGRES_DB: three_tier
+      POSTGRES_USER: lab
+      POSTGRES_PASSWORD: labpass
+    volumes:
+      - ./runtime/postgres:/var/lib/postgresql
+      - ./runtime/evidence:/evidence
+    networks:
+      - data_net
+      - observability_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lab -d three_tier"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  security-integration-node:
+    build:
+      context: ./mock-node
+    container_name: security-integration-node
+    environment:
+      NODE_NAME: security-integration-node
+      NODE_ROLE: security
+      NODE_PORT: "8080"
+      EVIDENCE_DIR: /evidence/runtime
+    volumes:
+      - ./runtime/evidence:/evidence
+    networks:
+      - security_net
+      - observability_net
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/health', timeout=2).read()\""]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+
+  observability-node:
+    image: prom/prometheus:latest
+    container_name: observability-node
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --web.enable-lifecycle
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./runtime/prometheus:/prometheus
+      - ./runtime/evidence:/evidence
+    networks:
+      - observability_net
+    ports:
+      - "9090:9090"
+    depends_on:
+      k8s-control:
+        condition: service_healthy
+      k8s-worker-1:
+        condition: service_healthy
+      k8s-worker-2:
+        condition: service_healthy
+      k8s-worker-3:
+        condition: service_healthy
+      security-integration-node:
+        condition: service_healthy
+
+  load-chaos-node:
+    image: grafana/k6:latest
+    container_name: load-chaos-node
+    entrypoint: ["/bin/sh", "-ec", "sleep 31536000"]
+    volumes:
+      - ./k6:/scripts:ro
+      - ./runtime/evidence:/evidence
+    networks:
+      - ingress_net
+      - observability_net
+    depends_on:
+      k8s-worker-1:
+        condition: service_healthy
+
+networks:
+  ingress_net:
+    driver: bridge
+  cluster_net:
+    driver: bridge
+    internal: true
+  data_net:
+    driver: bridge
+    internal: true
+  security_net:
+    driver: bridge
+    internal: true
+  observability_net:
+    driver: bridge
+    internal: true
