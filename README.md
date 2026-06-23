@@ -1,35 +1,46 @@
-# Public Report – Module 15
-## Project: Crypto-Agility in Hybrid Corporate Environments for Post-Quantum Transition
+# CBOM-Driven Crypto-Agility for Post-Quantum Migration
 
-This repository contains **public-facing artifacts for Module 15**, consolidating the architecture, metrics, migration protocol, simulated environment deployment, and runtime-validated security assessment developed across **Sprints 1–5**.
+This repository presents the undergraduate thesis by Thomaz Klifson Falcão Barboza:
 
-### Module 15 public reports
-- English: `English/public-report-module15.md`
-- Português: `Português/relatorio-publico-modulo15.md`
+**CBOM-Driven Crypto-Agility for Post-Quantum Migration in Hybrid Three-Tier Environments**  
+**Method and Experimental Validation in a Simulated Banking Topology**
 
-### What Module 15 delivers (Sprints 1–5)
-- **Crypto-Agility Gateway architecture** (control-plane model to manage inventory → policy decisions → automation → rollback).
-- **Hybrid three-tier reference model** (presentation, application, data) for a hybrid environment (on-premises + cloud).
-- **Operational metrics and resilience criteria** (performance, overhead, MTTD/MTTR, rollback success, cost).
-- **PQC migration protocol** with staged rollout and explicit rollback/fallback gates.
-- **8-node containerized simulation** deployed on an academic server (rootless Podman), producing runtime evidence for baseline, canary, CBOM governance, and integrity scenarios.
-- **Architectural and security validation** with vulnerability analysis, risk classification, and documented red flags.
+The work proposes a Cryptography Bill of Materials (CBOM)-driven crypto-agility roadmap for governing the migration from classical public-key cryptography to post-quantum-ready approaches in hybrid enterprise architectures.
 
----
+## Thesis Scope
 
-# Relatório Público – Módulo 15
-## Projeto: Criptoagilidade em Ambientes Corporativos Híbridos para Transição Pós-Quântica
+The thesis focuses on crypto-agility as an operational governance problem, not only as a cryptographic primitive replacement. It studies how organizations can inventory cryptographic dependencies, prioritize migration decisions, deploy changes gradually, observe runtime behavior, and define rollback criteria across hybrid three-tier systems.
 
-Este repositório contém **artefatos públicos do Módulo 15**, consolidando arquitetura, métricas, protocolo de migração, implantação de ambiente simulado e validação de segurança com evidências de runtime desenvolvidos ao longo das **Sprints 1–5**.
+The proposed method combines:
 
-### Relatórios públicos do Módulo 15
-- English: `English/public-report-module15.md`
-- Português: `Português/relatorio-publico-modulo15.md`
+- CBOM and SBOM-based inventory of cryptographic dependencies.
+- Policy-driven migration decisions.
+- A crypto-agility governance gateway.
+- Canary deployment for controlled rollout.
+- Observability and evidence retention.
+- Rollback and recovery criteria for migration failures.
 
-### Entregas do Módulo 15 (Sprints 1–5)
-- **Arquitetura do Gateway de Criptoagilidade** (plano de controle para inventário → decisão → automação → rollback).
-- **Modelo de referência three-tier híbrido** (apresentação, aplicação e dados) para ambiente on-premise + nuvem.
-- **Métricas operacionais e critérios de resiliência** (desempenho, overhead, MTTD/MTTR, rollback seguro, custo).
-- **Protocolo de migração PQC** com rollout em canário e gates explícitos de rollback/fallback.
-- **Simulação containerizada de 8 nós** implantada em servidor acadêmico (Podman rootless), produzindo evidências de runtime para cenários de baseline, canário, governança CBOM e integridade.
-- **Validação arquitetural e de segurança** com análise de vulnerabilidades, classificação de risco e red flags documentados.
+The validation uses a simulated banking topology with eight logical nodes, rootless Podman, and k6 scenarios to evaluate functional behavior, latency, stress response, and recovery under simulated secret-service unavailability.
+
+## Repository Contents
+
+| File | Description |
+| --- | --- |
+| [TCC_Thomaz_Klifson_EN.pdf](<TCC_Thomaz_Klifson_EN.pdf>) | English version of the thesis. |
+| [TCC_Thomaz_Klifson_PT.pdf](<TCC_Thomaz_Klifson_PT.pdf>) | Portuguese version of the thesis. |
+| [TERMO DE AUTORIZAÇÃO DE PUBLICAÇÃO DE TRABALHO ACADÊMICO - Título em EN.pdf](<TERMO DE AUTORIZAÇÃO DE PUBLICAÇÃO DE TRABALHO ACADÊMICO - Título em EN.pdf>) | Publication authorization document associated with the English title. |
+| [TERMO DE AUTORIZAÇÃO DE PUBLICAÇÃO DE TRABALHO ACADÊMICO - Título em PT.pdf](<TERMO DE AUTORIZAÇÃO DE PUBLICAÇÃO DE TRABALHO ACADÊMICO - Título em PT.pdf>) | Publication authorization document associated with the Portuguese title. |
+| [LICENSE](<LICENSE>) | Repository license. |
+| [2025-2A-T20-G99-INTERNO.code-workspace](<2025-2A-T20-G99-INTERNO.code-workspace>) | VS Code workspace metadata for opening the repository locally. |
+
+## Academic Context
+
+- **Author:** Thomaz Klifson Falcão Barboza
+- **Advisor:** Prof. Reginaldo Arakaki
+- **Institution:** Institute of Technology and Leadership (Inteli)
+- **Program:** Bachelor of Computer Science
+- **Year:** 2026
+
+## Keywords
+
+Crypto-agility, post-quantum cryptography, CBOM, three-tier architecture, cryptographic migration.
